@@ -29,6 +29,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    //jsoup 크롤링용
+    implementation 'org.jsoup:jsoup:1.18.1'
     compileOnly 'org.projectlombok:lombok'
 
     // SQLite
