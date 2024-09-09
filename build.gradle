@@ -32,6 +32,10 @@ dependencies {
     //jsoup 크롤링용
     implementation 'org.jsoup:jsoup:1.18.1'
     compileOnly 'org.projectlombok:lombok'
+    //selenium 크롤링
+    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+    implementation 'org.seleniumhq.selenium:selenium-java:4.24.0'
+
 
     // SQLite
     implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
