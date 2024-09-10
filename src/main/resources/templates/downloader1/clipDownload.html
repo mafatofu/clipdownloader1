@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="kr" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<div th:if="${#strings.isEmpty(videoSrcUrl)}">
-    <p>올바른 클립 주소 입력 시 이곳에 영상이 나타납니다.</p>
-</div>
-<div th:unless="${#strings.isEmpty(videoSrcUrl)}">
-    <video controls="" autoplay="" name="media">
-        <source th:src="${videoSrcUrl}" type="video/mp4">
-    </video>
-</div>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
 </head>
 <body>
-
+    <div th:if="${#strings.isEmpty(videoSrcUrl)}">
+        <p>올바른 클립 주소 입력 시 이곳에 영상이 나타납니다.</p>
+    </div>
+    <div th:unless="${#strings.isEmpty(videoSrcUrl)}">
+        <video controls="" autoplay="" name="media">
+            <source th:src="${videoSrcUrl}" type="video/mp4">
+        </video>
+    </div>
 </body>
 </html>
