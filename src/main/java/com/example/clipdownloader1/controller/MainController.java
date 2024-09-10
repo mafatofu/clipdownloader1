@@ -32,8 +32,7 @@ public class MainController {
     @ResponseBody
     public String clipDownload(
             @RequestParam(required = true)
-            String clipUrl,
-            RedirectAttributes redirectAttributes
+            String clipUrl
     ) throws IOException {
         //selenium을 활용한 크롤링
         return crawlingService.chzzkClipCrawling(clipUrl);
