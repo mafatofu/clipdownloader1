@@ -29,10 +29,10 @@ public class MainController {
     }
     //클립 url을 받아서 클립 다운로드
     @GetMapping("/clipDownload")
+    @ResponseBody
     public String clipDownload(
             @RequestParam(required = true)
             String clipUrl,
-            Model model,
             RedirectAttributes redirectAttributes
     ) throws IOException {
         //selenium을 활용한 크롤링
@@ -66,7 +66,7 @@ public class MainController {
             driver.close();
         }
         //다운로드 가능한 비디오 url을 찾았으면, 그 url을 view단으로 넘겨주기
-        redirectAttributes.addFlashAttribute("videoSrcUrl", clipSrcUrl);
-        return "redirect:/";
+        //redirectAttributes.addFlashAttribute("videoSrcUrl", clipSrcUrl);
+        return clipSrcUrl;
     }
 }

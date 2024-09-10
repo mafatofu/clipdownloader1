@@ -4,19 +4,70 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+        #videoOn{
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <form action="/clipDownload" method="get">
    <input type="text" id="clipUrl" name="clipUrl" placeholder="클립 url을 입력해주세요" required>
-    <button type="submit">입력</button>
+    <button id="clipUrlSubmit" type="submit">입력</button>
 </form>
-<div th:if="${#strings.isEmpty(videoSrcUrl)}">
+<div id="videoNone">
     <p>올바른 클립 주소 입력 시 이곳에 영상이 나타납니다.</p>
 </div>
-<div th:unless="${#strings.isEmpty(videoSrcUrl)}">
-    <video controls="" autoplay="" name="media">
-        <source th:src="${videoSrcUrl}" type="video/mp4">
+<div id="videoOn">
+    <video id="clipVideo" controls="" name="media">
+        <source id="videoSource" type="video/mp4">
     </video>
 </div>
+<!--<div th:if="${#strings.isEmpty(videoSrcUrl)}">-->
+<!--    <p>올바른 클립 주소 입력 시 이곳에 영상이 나타납니다.</p>-->
+<!--</div>-->
+<!--<div th:unless="${#strings.isEmpty(videoSrcUrl)}">-->
+<!--    <video id="clipVideo" controls="" name="media">-->
+<!--        <source th:src="${videoSrcUrl}" type="video/mp4">-->
+<!--    </video>-->
+<!--</div>-->
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> <!-- jQuery -->
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script>
+    $('#clipUrlSubmit').click(function (event){
+        event.preventDefault();
+        const clipUrl = $('#clipUrl').val();
+        //정규식 체크 함수 활용
+        if(!isValidUrl(clipUrl)){
+            alert("사용불가한 url입니다.");
+        } else {
+            $.ajax({
+                type : "get",
+                url : "/clipDownload",
+                data : {
+                    clipUrl : clipUrl
+                },
+                success : function (result){
+                    //비디오 보여주기
+                    document.getElementById("videoOn").style.display = 'block';
+                    document.getElementById("videoNone").style.display = 'none';
+                    //video태그의 src부분 채워주기
+                    $("#clipVideo").attr("src", result)
+
+
+                },
+                error:function (error){
+                    alert("에러가 발생했습니다. 클립주소를 확인해주세요!" + error);
+                }
+            });
+        }
+    });
+    //url 정규식 체크
+    function isValidUrl(clipUrl){
+        const urlRegex = /^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?$/i;
+        return urlRegex.test(clipUrl);
+    }
+
+</script>
 </html>
