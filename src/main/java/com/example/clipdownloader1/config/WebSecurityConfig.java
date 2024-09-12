@@ -27,6 +27,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/",
                                         "/clipDownload",
+                                        "/multiDownload",
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",

@@ -38,4 +38,11 @@ public class MainController {
         return crawlingService.chzzkClipCrawling(clipUrl);
 
     }
+    //한 명의 치지직 스트리머 이름을 입력창에 입력시, 
+    //해당하는 스트리머의 클립들이 모두 나타남
+    //나타난 클립들을 다운로드
+    @GetMapping("/multiDownload")
+    public String multiDownload(){
+        return "downloader1/multiDownload";
+    }
 }
