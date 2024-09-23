@@ -1,23 +1,36 @@
 package com.example.clipdownloader1.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDateTime;
+import java.util.List;
+/**멤버가 다운받은 클립에 대한 정보*/
 @Entity
-@Getter
 @Builder
-@DynamicInsert //insert 시 명시해주지 않아도 기본값 적용되도록
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "clip")
 public class Clip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String clipName;
-    private String clipMaker;
     private String streamer;
+    private String clipName;
+    private String originalUrl;
+    private String extractUrl;
+    private LocalDateTime downloadTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Member member;
+
+    @OneToMany(mappedBy = "clip", fetch = FetchType.LAZY)
+    private List<Likes> Likes;
+
 }
