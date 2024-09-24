@@ -21,6 +21,9 @@
             width: 500px;
             height: 30px;
         }
+        #clipDownloadDirectBtn{
+            visibility: hidden;
+        }
 
     </style>
 </head>
@@ -42,9 +45,37 @@
                 <source id="videoSource" type="video/mp4">
             </video>
         </div>
+        <div id="clipDownloadDirect">
+            <button class="btn btn-primary" id="clipDownloadDirectBtn" type="button">다운로드</button>
+        </div>
     </div>
 </body>
 <script>
+    $(`#clipDownloadDirectBtn`).click(function (event){
+        event.preventDefault();
+        //원본 vod 주소
+        const clipSrcUrl = document.getElementById("clipVideo").src
+
+        const formData = {
+            clipSrcUrl : clipSrcUrl
+        };
+        $.ajax({
+            type: "post",
+            url: "clipDownloadDirect",
+            contentType: "application/json",
+            data : JSON.stringify(formData),
+            success : function (result){
+                if (result === 0){
+                    alert("에러가 발생했습니다. 클립주소를 확인해주세요!");
+                }
+            },
+            error:function (error){
+                alert("에러가 발생했습니다." + error);
+            }
+
+        });
+    });
+
     $('#clipUrlSubmit').click(function (event){
         event.preventDefault();
         const clipUrl = $('#clipUrl').val();
@@ -62,6 +93,7 @@
                     //비디오 보여주기
                     document.getElementById("videoOn").style.display = 'block';
                     document.getElementById("videoNone").style.display = 'none';
+                    document.getElementById("clipDownloadDirectBtn").style.visibility = 'visible';
                     //video태그의 src부분 채워주기
                     $("#clipVideo").attr("src", result)
 

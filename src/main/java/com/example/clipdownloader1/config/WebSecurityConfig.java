@@ -26,8 +26,12 @@ public class WebSecurityConfig {
                         auth -> auth
                                 .requestMatchers(
                                         "/",
+                                        //클립동영상띄워주기
                                         "/clipDownload",
+                                        //멀티 다운로드
                                         "/multiDownload",
+                                        //파일 직접다운로드
+                                        "/clipDownloadDirect",
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
