@@ -1,17 +1,30 @@
 package com.example.clipdownloader1.service;
 
+import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.repo.ClipRepo;
+import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.HttpStatusException;
+import org.springframework.beans.factory.annotation.Value;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**파일입출력 관련 서비스*/
 @Service
@@ -21,35 +34,40 @@ public class FileService {
     private final ClipService clipService;
 
     /**크롤링해온 클립 링크를 바로 다운로드하는 기능(240924 현재 다운로드 안됨)*/
+    @Value("${spring.servlet.multipart.location}")
+    String location;
     public int chzzkClipDirectDownload(
-            String clipSrcUrl,
-            HttpServletRequest request,
-            HttpServletResponse response
-            ){
+            ClipInfoDto clipInfoDto
+            ) throws IOException {
+        //결과 리턴용 변수
         int result = 0;
-        //String clipSrcUrl = crawlingService.chzzkClipCrawling(clipUrl);
-
-        try {
-            //TODO 크롤링서비스 추가하여, 원본클립명으로 다운로드
-            String fileName = "clipDownload" + ".mp4";
-            URLConnection fetchWebsite = new URL(clipSrcUrl).openConnection();
-            InputStream in = new BufferedInputStream(fetchWebsite.getInputStream());
-            ServletOutputStream out = response.getOutputStream();
-
-            response.setHeader( "Content-Transfer-Encoding", "binary" );
-            response.setContentType( "application/x-download" ); //이거 없으면 다운로드 안됨..
-            response.setContentType("application/octet-stream"); //다운로드 받는 타입이 파일 이라는 것을 명시
-            response.setHeader("Content-Disposition", "filename=" + fileName + ";");//파일 명을 정하는 곳
-
-            IOUtils.copy(in, out); // 실질적으로 파일을 다운로드(copy)하는 곳
-
-            out.flush();
-            out.close();
-            in.close();
+        //클립명에 시간붙여주는 용 변수
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        LocalDateTime aa = LocalDateTime.now();
+        //디렉토리 생성을 위한 path
+        Path directoryPath = Paths.get(location);
+        //디렉토리가 존재하지 않는다면 생성해주기
+        if (!Files.isDirectory(directoryPath)){
+            Files.createDirectory(directoryPath);
+        }
+        //2. 클립명. 겹치지 않게 초단위 시간을 붙여줌.
+        String OUTPUT_FILE_PATH = location +"\\"+ clipInfoDto.getClipTitle()+"_"+aa.format(dtf) +".mp4";
+        Path clipPath = Paths.get(OUTPUT_FILE_PATH);
+        if (Files.exists(clipPath)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "클립명이 겹칩니다. 같은 클립 다운로드 연타");
+        }
+        //파일 다운로드
+        try(InputStream in = new URL(clipInfoDto.getClipSrcUrl()).openStream()){
+            System.out.println(LocalDateTime.now().format(dtf)+" : -------------파일 다운로드 시작!-------------");
+            Files.copy(in, clipPath);
             result = 1;
-        } catch (Exception e){
-            e.printStackTrace();
-            System.out.println("파일 저장 에러 발생");
+            System.out.println(LocalDateTime.now().format(dtf)+" : -------------파일 다운로드 완료!-------------");
+        } catch (MalformedURLException e) {
+            System.out.println("영상가져오는데 에러!");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            System.out.println("파일입출력 에러!");
+            throw new RuntimeException(e);
         }
         return result;
     }

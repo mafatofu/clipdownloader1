@@ -3,6 +3,10 @@
 <head>
     <th:block th:replace="~{common/header :: headerFragment}"></th:block>
     <style>
+        body{
+            display: flex;
+            justify-content: space-between;
+        }
         #videoOn{
             display: none;
         }
@@ -24,40 +28,65 @@
         #clipDownloadDirectBtn{
             visibility: hidden;
         }
+        #clipInfo{
+            color: aliceblue;
+        }
+        #clipInfo{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
 
     </style>
 </head>
 <body>
-<a href="/multiDownload">멀티 다운로드</a>
-    <div id="chzzkClipUrlInput">
-        <form action="/clipDownload" method="get">
-           <input type="text" placeholder="클립 url을 입력해주세요"
-                  id="clipUrl" name="clipUrl"
-           required>
-            <button class="btn btn-primary" id="clipUrlSubmit" type="submit">입력</button>
-        </form>
-        <div id="videoNone">
-            <br>
-            <p id="notice">올바른 클립 주소 입력 시<br>아래에 다운로드 가능한 영상이 나타납니다.</p>
-        </div>
-        <div id="videoOn">
-            <video id="clipVideo" controls="" name="media">
-                <source id="videoSource" type="video/mp4">
-            </video>
-        </div>
-        <div id="clipDownloadDirect">
-            <button class="btn btn-primary" id="clipDownloadDirectBtn" type="button">다운로드</button>
+    <div id="mainLeft"></div>
+    <div id="mainCenter">
+        <a href="/multiDownload">멀티 다운로드</a>
+
+        <div id="chzzkClipUrlInput">
+            <form action="/clipDownload" method="get">
+               <input type="text" placeholder="클립 url을 입력해주세요"
+                      id="clipUrl" name="clipUrl"
+               required>
+                <button class="btn btn-primary" id="clipUrlSubmit" type="submit">입력</button>
+            </form>
+            <div id="videoNone">
+                <div id="notice">
+                    <p>올바른 클립 주소 입력 시<br>아래에 다운로드 가능한 영상이 나타납니다.</p>
+                    <p>클립은 C드라이브 내 "chzzkClip" 폴더 내로 저장됩니다(다운로드시 폴더 자동 생성)</p>
+                </div>
+            </div>
+            <div id="clipInfo">
+                <div id="infos">
+                    <span id="streamer"></span><br>
+                    <span id="clipperName"></span><br>
+                    <span id="clipTitle"></span><br>
+                </div>
+                <div id="clipDownloadDirect">
+                    <button class="btn btn-primary" id="clipDownloadDirectBtn" type="button">다운로드</button>
+                </div>
+            </div>
+            <div id="videoOn">
+                <video id="clipVideo" controls="">
+                    <source id="videoSource" type="video/mp4">
+                </video>
+            </div>
         </div>
     </div>
+    <div id="mainRight"></div>
 </body>
 <script>
     $(`#clipDownloadDirectBtn`).click(function (event){
         event.preventDefault();
         //원본 vod 주소
-        const clipSrcUrl = document.getElementById("clipVideo").src
-
+        let clipSrcUrl = $('#clipVideo').attr('src');
+        let clipTitle = $('#clipVideo').attr('name');
+        //클립명
         const formData = {
-            clipSrcUrl : clipSrcUrl
+            clipSrcUrl : clipSrcUrl,
+            clipTitle : clipTitle
         };
         $.ajax({
             type: "post",
@@ -67,10 +96,12 @@
             success : function (result){
                 if (result === 0){
                     alert("에러가 발생했습니다. 클립주소를 확인해주세요!");
+                } else if (result === 1){
+                    alert("클립이 다운로드되었습니다!");
                 }
             },
             error:function (error){
-                alert("에러가 발생했습니다." + error);
+                alert("에러가 발생했습니다.");
             }
 
         });
@@ -95,7 +126,19 @@
                     document.getElementById("videoNone").style.display = 'none';
                     document.getElementById("clipDownloadDirectBtn").style.visibility = 'visible';
                     //video태그의 src부분 채워주기
-                    $("#clipVideo").attr("src", result)
+                    $("#clipVideo").attr("src", result.clipSrcUrl);
+                    $("#clipVideo").attr("name", result.clipTitle);
+
+                    //정상적으로 가져올 시, result에는 dto가 포함되어있어야함
+                    //dto의 각 값을 view단에 뿌려주기
+                    let streamer = $('#streamer');
+                    let clipperName = $('#clipperName');
+                    let clipTitle = $('#clipTitle');
+
+                    streamer.text("스트리머 : " + result.streamer);
+                    clipperName.text("클립퍼 : " + result.clipperName);
+                    clipTitle.text("클립 제목 : " + result.clipTitle);
+                    //뿌려준 값들 중, 제목은 '다운로드' 버튼 클릭 시 clipSrcUrl과 함께 back단으로 넘기기
 
 
                 },

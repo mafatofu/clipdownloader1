@@ -1,6 +1,8 @@
 package com.example.clipdownloader1.service;
 
+import com.example.clipdownloader1.dto.ClipInfoDto;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -149,7 +151,13 @@ public class ClipService {
     *                     - 원본 vod주소가 있는 html문서 획득
     *             5. html 문서 파싱 - 원본 vod주소를 획득
      */
-    public String chzzkClipInfoTake(String clipUrl) throws Exception {
+    //@Value("${spring.servlet.multipart.location}")
+    String location;
+    public ClipInfoDto chzzkClipInfoTake(
+            String clipUrl
+    ) throws Exception {
+        //return용 DTO
+        ClipInfoDto clipInfoDto = new ClipInfoDto();
         //clipUid 추출
         String[] clipUrlSplit = clipUrl.split("/");
         String clipUid = clipUrlSplit[clipUrlSplit.length - 1];
@@ -160,6 +168,10 @@ public class ClipService {
         HttpURLConnection connection = httpUrlConnectSimple(takeVideoUrl);
         //요청으로 받은 json data를 map으로 받음
         Map<String, Object> takeVideoMap = jsonDataReceiveToMap(connection);
+        //클립 제목
+        String clipTitle = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("clipTitle");
+        //썸네일 url
+        String thumbnailImageUrl = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("thumbnailImageUrl");
 
         //추출한 videoId
         String videoId = ((HashMap<?, ?>) takeVideoMap.get("content")).get("videoId").toString();
@@ -175,20 +187,34 @@ public class ClipService {
 
         //두번째 요청
         HttpURLConnection connection2 = httpUrlConnectSimple(takeSrcUrl);
-        //재사용을 위한 비우기ㄴ
+        //재사용을 위한 비우기
         takeVideoMap.clear();
         
         //요청으로 받은 connection data에서 원본 클립 주소가 들어있는 json부분만 String으로 받음
         //json형태의 String을 map으로 받음
         String jsonString = ConnectionDataToString(connection2);
         takeVideoMap = mainService.jsonToMap(jsonString);
-        List<HashMap<?,?>> mapList = new ArrayList<>();
          //여러겹으로 둘러쌓인 데이터 풀어내어, 원본 영상 url 뽑아내기
         String clipSrcUrl =
                 (String) ((Map)(((List)((Map)((Map)((Map)((Map)((Map)takeVideoMap.get("card"))
                         .get("content")).get("vod")).get("playback")).get("videos"))
                         .get("list"))).get(0)).get("source");
-        return clipSrcUrl;
+        //스트리머이름
+        String streamer = (String) ((Map)((List)((Map)
+                takeVideoMap.get("card")).get("shortFormBanners")).get(0)).get("title");
+        //클리퍼 닉네임
+        String clipperName = (String) ((Map)((Map)(((Map)
+                takeVideoMap.get("card")).get("interaction"))).get("subscription")).get("name");
+        //srcUrl 클립제목 썸네일 스트리머이름 클립 딴사람이름 싹다 묶어서 dto로
+
+        clipInfoDto.setClipSrcUrl(clipSrcUrl);
+        clipInfoDto.setStreamer(streamer);
+        clipInfoDto.setClipperName(clipperName);
+        clipInfoDto.setOriginalUrl(clipUrl);
+        clipInfoDto.setClipTitle(clipTitle);
+        clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
+
+        return clipInfoDto;
     }
 
 }

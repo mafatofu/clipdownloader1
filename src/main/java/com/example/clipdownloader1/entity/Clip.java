@@ -20,10 +20,12 @@ public class Clip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String clipSrcUrl;
     private String streamer;
-    private String clipName;
+    private String clipperName;
     private String originalUrl;
-    private String extractUrl;
+    private String clipTitle;
+    private String clipThumbnailUrl;
     private LocalDateTime downloadTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

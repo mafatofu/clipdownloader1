@@ -22,9 +22,9 @@ public class ClipDto {
         return ClipDto.builder()
                 .id(entity.getId())
                 .streamer(entity.getStreamer())
-                .clipName(entity.getClipName())
+                .clipName(entity.getClipTitle())
                 .originalUrl(entity.getOriginalUrl())
-                .extractUrl(entity.getExtractUrl())
+                .extractUrl(entity.getClipSrcUrl())
                 .downloadTime(entity.getDownloadTime())
                 .build();
     }

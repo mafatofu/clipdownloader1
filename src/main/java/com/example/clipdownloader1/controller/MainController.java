@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 //테스트용 컨트롤러
@@ -30,14 +31,13 @@ public class MainController {
     /**클립 url을 받아서 클립 다운로드*/
     @GetMapping("/clipDownload")
     @ResponseBody
-    public String clipDownload(
+    public ResponseEntity<ClipInfoDto> clipDownload(
             @RequestParam(required = true)
             String clipUrl
     ) throws Exception {
         //HttpURLConnection으로 다운로드 가능한 원본영상 가져오기
-        return clipService.chzzkClipInfoTake(clipUrl);
-        //selenium을 활용한 크롤링
-        //return clipService.chzzkClipCrawling(clipUrl);
+        ClipInfoDto clipInfoDto = clipService.chzzkClipInfoTake(clipUrl);
+        return ResponseEntity.ok(clipInfoDto);
 
     }
     /**한 명의 치지직 스트리머 이름을 입력창에 입력시, 
@@ -47,17 +47,16 @@ public class MainController {
     public String multiDownload(){
         return "downloader1/multiDownload";
     }
+
     /**다운로드 버튼 클릭 시 PC에 바로 저장 컨트롤러*/
     @PostMapping("/clipDownloadDirect")
     @ResponseBody
     public ResponseEntity<Integer> clipDownloadDirect(
-            @RequestBody ClipInfoDto clipInfoDto,
-            HttpServletResponse response,
-            HttpServletRequest request
-    ){
+            @RequestBody ClipInfoDto clipInfoDto
+    ) throws IOException {
         HttpStatus statusResult = HttpStatus.NOT_FOUND;
         //service단의 결과에 따라 분기하기
-        int result = fileService.chzzkClipDirectDownload(clipInfoDto.getClipSrcUrl(), request, response);
+        int result = fileService.chzzkClipDirectDownload(clipInfoDto);
         if (result == 1)
             statusResult = HttpStatus.OK;
 
