@@ -27,6 +27,7 @@ public class Clip {
     private String clipTitle;
     private String clipThumbnailUrl;
     private LocalDateTime downloadTime;
+    private LocalDateTime createdDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)

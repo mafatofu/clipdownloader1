@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 //테스트용 컨트롤러
 @Controller
@@ -28,7 +31,7 @@ public class MainController {
     ){
         return "downloader1/home";
     }
-    /**클립 url을 받아서 클립 다운로드*/
+    /**클립 url을 받아서 다운로드가능한 주소를 프론트로 리턴*/
     @GetMapping("/clipDownload")
     @ResponseBody
     public ResponseEntity<ClipInfoDto> clipDownload(
@@ -40,13 +43,38 @@ public class MainController {
         return ResponseEntity.ok(clipInfoDto);
 
     }
-    /**한 명의 치지직 스트리머 이름을 입력창에 입력시, 
-    해당하는 스트리머의 클립들이 모두 나타남
-    나타난 클립들을 다운로드*/
+    /**한 명의 치지직 스트리머 이름을 입력창에 입력시,
+     해당하는 스트리머의 클립들이 모두 나타남
+     나타난 클립들을 다운로드*/
     @GetMapping("/multiDownload")
     public String multiDownload(){
         return "downloader1/multiDownload";
     }
+
+    /**스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립을 가져오기*/
+    @GetMapping("/multiDownload/{streamerName}/{orderType}")
+    public String streamerClipSearch(
+            @PathVariable String streamerName,
+            @PathVariable String orderType,
+            Model model
+    ) throws Exception {
+        //받아온 스트리머명과 정렬기준으로 검색
+        HttpStatus statusResult = HttpStatus.NOT_FOUND;
+        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+        try {
+            clipInfoDtoList =
+                    clipService.streamerClipSearchService(streamerName,orderType);
+            statusResult = HttpStatus.OK;
+        } catch (Exception e){
+            System.out.println("--------------스트리머 검색 에러--------------");
+            e.printStackTrace();
+        }
+        //결과를 view단으로 넘기기
+        model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        return "downloader1/multiDownload";
+
+    }
+
 
     /**다운로드 버튼 클릭 시 PC에 바로 저장 컨트롤러*/
     @PostMapping("/clipDownloadDirect")
@@ -62,4 +90,6 @@ public class MainController {
 
         return new ResponseEntity<Integer>(result, statusResult);
     }
+
+
 }

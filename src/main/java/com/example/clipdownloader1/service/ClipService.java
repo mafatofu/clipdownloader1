@@ -1,5 +1,6 @@
 package com.example.clipdownloader1.service;
 
+import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -10,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.BufferedReader;
@@ -18,6 +20,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +31,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ClipService {
     private final MainService mainService;
+    private final chzzkUrls chzzkUrls;
+    //스트리머 검색 후 uid를 특정지어 가져올 수 있는 html class
+    private static String streamerSearchParticle = "channel_item_wrapper__CT2Qw";
     public WebDriver crawlingStandard(){
         //selenium을 활용한 크롤링
         String WEB_DRIVER_ID = "webdriver.chrome.driver";
@@ -70,9 +77,9 @@ public class ClipService {
         return clipSrcUrl;
     }
     /**HttpURLConnection 연결 메서드* */
-    public HttpURLConnection httpUrlConnectSimple(String clipUrl) throws IOException {
+    public HttpURLConnection httpUrlConnectSimple(String searchUrl) throws IOException {
         // 웹 페이지 URL 생성
-        URL url = new URL(clipUrl);
+        URL url = new URL(searchUrl);
         // HttpURLConnection 객체 생성
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -172,6 +179,11 @@ public class ClipService {
         String clipTitle = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("clipTitle");
         //썸네일 url
         String thumbnailImageUrl = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("thumbnailImageUrl");
+        //만든날짜
+        String createdDate = ((HashMap<?, ?>) takeVideoMap.get("content")).get("createdDate").toString();
+        //2023-12-19 22:45:20
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime createdDateTime = LocalDateTime.parse(createdDate, dtf);
 
         //추출한 videoId
         String videoId = ((HashMap<?, ?>) takeVideoMap.get("content")).get("videoId").toString();
@@ -213,8 +225,38 @@ public class ClipService {
         clipInfoDto.setOriginalUrl(clipUrl);
         clipInfoDto.setClipTitle(clipTitle);
         clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
+        clipInfoDto.setCreatedDateTime(createdDateTime);
 
         return clipInfoDto;
+    }
+
+
+    /**스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립을 가져옴
+     * 정렬기준은 인기순 / 최신순
+     * /multiDownload/{스트리머이름}/{정렬기준}
+     * 정렬기준 디폴트는 인기순
+     * */
+    public List<ClipInfoDto> streamerClipSearchService(
+            String streamerName,
+            String orderType
+    ) throws Exception {
+        //1. 스트리머 id로 검색한 최상위 결과에서 uid를 가져옴
+        /* 
+            channel_item_wrapper__CT2Qw << 이 String이 포함되어있다면 가져오기. break
+            가져온 String에서 uid만 뽑아내기
+            만약 channel_item_wrapper__CT2Qw 클래스가 존재하지 않다면 throw Exception BAD_REQUEST
+        * */
+        HttpURLConnection connection =
+                httpUrlConnectSimple(chzzkUrls.streamerSearchUrl(streamerName));
+        Map<String, Object> streamerInfoMap = jsonDataReceiveToMap(connection);
+        
+        //map에서 uid를 하나 가져오기
+        String uid = "";
+        //2. 스트리머 uid로 검색한 결과를 10개씩 페이징하여 가져옴
+
+        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+
+        return clipInfoDtoList;
     }
 
 }

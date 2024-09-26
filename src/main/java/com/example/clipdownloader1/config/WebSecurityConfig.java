@@ -32,6 +32,8 @@ public class WebSecurityConfig {
                                         "/multiDownload",
                                         //파일 직접다운로드
                                         "/clipDownloadDirect",
+                                        //스트리머로 검색
+                                        "/multiDownload/{streamerName}/{orderType}",
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",

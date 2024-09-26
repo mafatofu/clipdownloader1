@@ -24,11 +24,20 @@
     <a href="/">일반 다운로드</a>
     <div id="searchClips">
         <form>
-            <input id="streamerSearch" type="text" placeholder="스트리머를 검색해주세요">
-            <button class="btn btn-primary" type="button">검색</button>
+            <input id="streamerClipSearch" type="text" placeholder="스트리머를 검색해주세요">
+            <button class="btn btn-primary" id="streamerClipSearchBtn" type="button">검색</button>
         </form>
         <p id="notice"><br>여러 개의 클립을 한 번에 다운로드 가능합니다.</p>
-        몸살
+    </div>
+    <div>
+        <table th:unless="${clipInfoDtoList.isEmpty()}" class="clipTable">
+            이게보이면 뭔가 있다는거임
+        </table>
     </div>
 </body>
+<script>
+
+
+
+</script>
 </html>
