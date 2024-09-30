@@ -143,7 +143,7 @@ public class ClipService {
             }
         }
         //연결 종료
-        connection.disconnect();
+        //connection.disconnect();
         //BufferedReader close
         reader.close();
         return result;
@@ -226,6 +226,10 @@ public class ClipService {
         clipInfoDto.setClipTitle(clipTitle);
         clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
         clipInfoDto.setCreatedDateTime(createdDateTime);
+        
+        //연결종료
+        connection.disconnect();
+        connection2.disconnect();
 
         return clipInfoDto;
     }
@@ -255,6 +259,11 @@ public class ClipService {
         //2. 스트리머 uid로 검색한 결과를 10개씩 페이징하여 가져옴
 
         List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+        //스트리머 데이터
+        Map<String, Object> extractMap
+                = (Map<String, Object>) ((Map)((List)((Map)streamerInfoMap.get("content")).get("data")).get(0)).get("channel");
+
+
 
         return clipInfoDtoList;
     }

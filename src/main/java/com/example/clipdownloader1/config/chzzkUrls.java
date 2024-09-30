@@ -1,6 +1,10 @@
 package com.example.clipdownloader1.config;
 
 import org.springframework.stereotype.Component;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 @Component
 /**치지직 관련 connection에 사용되는 url들을 모아둔 클래스*/
 public class chzzkUrls {
@@ -9,9 +13,10 @@ public class chzzkUrls {
      * */
     public String streamerSearchUrl(
             String streamerName
-    ){
-        //https://api.chzzk.naver.com/service/v1/search/channels?keyword=%EC%9D%B4%EB%A1%9C%EC%9D%80&size=1
-        return "https://api.chzzk.naver.com/service/v1/search/channels?keyword="+streamerName;
+    ) throws UnsupportedEncodingException {
+        return "https://api.chzzk.naver.com/service/v1/search/channels?keyword="
+                + URLEncoder.encode(streamerName, "UTF-8")
+                +"&offset=0&size=1";
     }
     /**치지직 스트리머 클립 url
      *
