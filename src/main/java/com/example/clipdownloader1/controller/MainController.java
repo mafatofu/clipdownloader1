@@ -1,6 +1,7 @@
 package com.example.clipdownloader1.controller;
 
 import com.example.clipdownloader1.dto.ClipInfoDto;
+import com.example.clipdownloader1.dto.StreamerClipSearchDto;
 import com.example.clipdownloader1.service.ClipService;
 import com.example.clipdownloader1.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,6 +65,29 @@ public class MainController {
         try {
             clipInfoDtoList =
                     clipService.streamerClipSearchService(streamerName,orderType);
+            statusResult = HttpStatus.OK;
+        } catch (Exception e){
+            System.out.println("--------------스트리머 검색 에러--------------");
+            e.printStackTrace();
+        }
+        //결과를 view단으로 넘기기
+        model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        return "downloader1/multiDownload";
+
+    }
+    /** 스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립 이전 / 다음페이지
+    //dto로 front단의 데이터를 받아온다.*/
+    @GetMapping("/multiDownload/{streamerName}/{orderType}/otherPage")
+    public String streamerClipSearch(
+            StreamerClipSearchDto streamerClipSearchDto,
+            Model model
+    ) throws Exception {
+        //받아온 스트리머명과 정렬기준으로 검색
+        HttpStatus statusResult = HttpStatus.NOT_FOUND;
+        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+        try {
+            clipInfoDtoList =
+                    clipService.streamerClipSearchService(streamerClipSearchDto);
             statusResult = HttpStatus.OK;
         } catch (Exception e){
             System.out.println("--------------스트리머 검색 에러--------------");

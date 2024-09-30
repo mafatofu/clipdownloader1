@@ -164,7 +164,7 @@
                 alert("올바르지 않은 스트리머명입니다!(공백불가)");
             } else {
                 //검색페이지로 이동
-                const orderType = "POPULAR"; // 기본 인기순
+                const orderType = "POPULAR"; // 기본 인기순. 이후 결과페이지에서는 버튼 클릭 등에 따라 인기순 / 최신순으로 분기
                 location.href = "/multiDownload/"+searchText+"/"+orderType;
             }
         }

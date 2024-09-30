@@ -28,12 +28,14 @@ public class Clip {
     private String clipThumbnailUrl;
     private LocalDateTime downloadTime;
     private LocalDateTime createdDateTime;
+    //재생횟수
+    private int readCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
     @OneToMany(mappedBy = "clip", fetch = FetchType.LAZY)
-    private List<Likes> Likes;
+    private List<Likes> likes;
 
 }
