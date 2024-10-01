@@ -52,5 +52,27 @@ public class chzzkUrls {
                 "orderType="+orderType+
                 "&size="+size;
     }
+
+    /**치지직 클립 주소*/
+    public String clipUrl(
+            String clipUid
+    ){
+        return "https://chzzk.naver.com/clips/og5Bsv3XM1" + clipUid;
+    }
+
+    /**clipUid와 videoId로 원본 video url요청*/
+    public String takeSrcUrl(
+            String clipUid,
+            String videoId
+    ){
+        return "https://m.naver.com/shorts/?mediaId="+videoId+
+                "&serviceType=CHZZK&mediaType=&recType=CHZZK&recId=%7B%22seedClipUID%22%3A%22"+clipUid+
+                "%22%2C%22fromType%22%3A%22GLOBAL%22%2C%22listType%22%3A%22RECOMMEND%22%7D&b" +
+                "logId=&docNo=&adAllowed=Y&feedBlock=&enableReverse=false" +
+                "&notInterestedMediaIds=&notInterestedChannelIds=&panelType=sdk_chzzk" +
+                "&entryPoint=&stmsId=&clickNsc=chzzk_url_clip" +
+                "&clickArea=clip_item&adUnitId=chzzk_shortformviewer_web&viewerInfo=chzzk_shortformviewer_web" +
+                "&adCtrl=P&theme=light&viewMode=mobile&sdkTargetId=PLAYER-SDK-0-45&env=&embed=true";
+    }
 }
 
