@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -159,6 +160,25 @@ public class ClipService {
     *                     - 원본 vod주소가 있는 html문서 획득
     *             5. html 문서 파싱 - 원본 vod주소를 획득
      */
+    /**clipUid와 videoId로 원본 video url을 가져온다.*/
+    public String findVodUrl(
+            String clipUid,
+            String videoId
+    ) throws Exception {
+        String takeSrcUrl = chzzkUrls.takeSrcUrl(clipUid,videoId);
+        HttpURLConnection connection = httpUrlConnectSimple(takeSrcUrl);
+        String jsonString = ConnectionDataToString(connection);
+        Map<String, Object> takeVideoMap = mainService.jsonToMap(jsonString);
+        //여러겹으로 둘러쌓인 데이터 풀어내어, 원본 영상 url 뽑아내기
+        String clipSrcUrl =
+                (String) ((Map)(((List)((Map)((Map)((Map)((Map)((Map)takeVideoMap.get("card"))
+                        .get("content")).get("vod")).get("playback")).get("videos"))
+                        .get("list"))).get(0)).get("source");
+        //커넥션해제
+        connection.disconnect();
+        return clipSrcUrl;
+    }
+
     //@Value("${spring.servlet.multipart.location}")
     String location;
     public ClipInfoDto chzzkClipInfoTake(
@@ -269,12 +289,22 @@ public class ClipService {
 
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
-        
+
+        //videoId랑 클립uid를 사용하는 방법?
+
+        //클립uid로 원본 vod url 뽑아오기
+
         //List<dto>로 담기
         for (int i = 0; i < clipsMapList.size(); i++) {
+            String clipUid = ((String) clipsMapList.get(i).get("clipUID"));
+            String videoId = ((String) clipsMapList.get(i).get("videoId"));
+            //뽑아온 clipUid와 videoId로 원본 url 찾아오기
+
             ClipInfoDto dto = ClipInfoDto.builder()
+                    .originalUrl(chzzkUrls.clipUrl(clipUid))
+                    .clipSrcUrl(findVodUrl(clipUid,videoId))
                     .clipThumbnailUrl((String) clipsMapList.get(i).get("thumbnailImageUrl"))
-                    .clipTitle((String) clipsMapList.get(0).get("clipTitle"))
+                    .clipTitle((String) clipsMapList.get(i).get("clipTitle"))
                     .readCount((Integer) clipsMapList.get(i).get("readCount"))
                     .build();
 
