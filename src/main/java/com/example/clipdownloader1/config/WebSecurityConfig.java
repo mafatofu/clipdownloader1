@@ -34,6 +34,8 @@ public class WebSecurityConfig {
                                         "/clipDownloadDirect",
                                         //스트리머로 검색
                                         "/multiDownload/{streamerName}/{orderType}",
+                                        //여러 개의 파일을 한번에 다운로드
+                                        "/multiDownload/clipDownloadDirectMulti",
                                         //템플릿 관련
                                         "/css/**",
                                         "/js/**",
