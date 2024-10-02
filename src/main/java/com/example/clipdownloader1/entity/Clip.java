@@ -24,6 +24,8 @@ public class Clip {
     private String streamer;
     private String clipperName;
     private String originalUrl;
+    //치지직 videoId
+    private String videoId;
     private String clipTitle;
     private String clipThumbnailUrl;
     private LocalDateTime downloadTime;
