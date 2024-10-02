@@ -51,7 +51,9 @@ public class FileService {
             Files.createDirectory(directoryPath);
         }
         //2. 클립명. 겹치지 않게 초단위 시간을 붙여줌.
-        String OUTPUT_FILE_PATH = location +"\\"+ clipInfoDto.getClipTitle()+"_"+aa.format(dtf) +".mp4";
+            //2.1 클립명에 특수문자 제거
+        String clipTitle = clipInfoDto.getClipTitle().replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", " ");
+        String OUTPUT_FILE_PATH = location +"\\"+ clipTitle+"_"+aa.format(dtf) +".mp4";
         Path clipPath = Paths.get(OUTPUT_FILE_PATH);
         if (Files.exists(clipPath)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "클립명이 겹칩니다. 같은 클립 다운로드 연타");
