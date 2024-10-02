@@ -4,23 +4,21 @@ import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.StreamerClipSearchDto;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import org.apache.tomcat.util.json.JSONParser;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.boot.json.JsonParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -160,6 +158,7 @@ public class ClipService {
     *                     - 원본 vod주소가 있는 html문서 획득
     *             5. html 문서 파싱 - 원본 vod주소를 획득
      */
+
     /**clipUid와 videoId로 원본 video url을 가져온다.*/
     public String findVodUrl(
             String clipUid,
@@ -169,6 +168,8 @@ public class ClipService {
         HttpURLConnection connection = httpUrlConnectSimple(takeSrcUrl);
         String jsonString = ConnectionDataToString(connection);
         Map<String, Object> takeVideoMap = mainService.jsonToMap(jsonString);
+        //JSONObject jsonObject = new JSONObject(jsonString);
+
         //여러겹으로 둘러쌓인 데이터 풀어내어, 원본 영상 url 뽑아내기
         String clipSrcUrl =
                 (String) ((Map)(((List)((Map)((Map)((Map)((Map)((Map)takeVideoMap.get("card"))
@@ -178,6 +179,8 @@ public class ClipService {
         connection.disconnect();
         return clipSrcUrl;
     }
+
+
 
     //@Value("${spring.servlet.multipart.location}")
     String location;
@@ -296,13 +299,13 @@ public class ClipService {
 
         //List<dto>로 담기
         for (int i = 0; i < clipsMapList.size(); i++) {
-            String clipUid = ((String) clipsMapList.get(i).get("clipUID"));
-            String videoId = ((String) clipsMapList.get(i).get("videoId"));
+            //String clipUid = ((String) clipsMapList.get(i).get("clipUID"));
+            //String videoId = ((String) clipsMapList.get(i).get("videoId"));
             //뽑아온 clipUid와 videoId로 원본 url 찾아오기
 
             ClipInfoDto dto = ClipInfoDto.builder()
-                    .originalUrl(chzzkUrls.clipUrl(clipUid))
-                    .clipSrcUrl(findVodUrl(clipUid,videoId))
+                    .originalUrl(((String) clipsMapList.get(i).get("clipUID")))
+                    .videoId(((String) clipsMapList.get(i).get("videoId")))
                     .clipThumbnailUrl((String) clipsMapList.get(i).get("thumbnailImageUrl"))
                     .clipTitle((String) clipsMapList.get(i).get("clipTitle"))
                     .readCount((Integer) clipsMapList.get(i).get("readCount"))

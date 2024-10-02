@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //테스트용 컨트롤러
 @Controller
@@ -115,5 +117,28 @@ public class MainController {
         return new ResponseEntity<Integer>(result, statusResult);
     }
 
-
+    /**여러 개의 클립을 한 번에 다운로드 컨트롤러*/
+    @PostMapping("/multiDownload/clipDownloadDirectMulti")
+    @ResponseBody
+    public ResponseEntity<List<String>> clipDownloadDirectMulti(
+            @RequestBody
+            List<ClipInfoDto> checkedClipList
+    ) throws Exception {
+        List<String> resultList = new ArrayList<>();
+        int downloadResult = 0;
+        //들어온 클립 수만큼 다운로드 횟수 반복
+        //map으로 클립제목 : 0/1(실패/성공) 여부 저장하여 돌려주기
+        for (int i = 0; i < checkedClipList.size(); i++) {
+            //클립 srcUrl 가져와야 함
+            checkedClipList.get(i).setClipSrcUrl(
+                    clipService.findVodUrl(checkedClipList.get(i).getOriginalUrl(), checkedClipList.get(i).getVideoId()));
+            downloadResult = fileService.chzzkClipDirectDownload(checkedClipList.get(i));
+            //다운로드 성공
+            if (downloadResult == 1){
+                resultList.add(checkedClipList.get(i).getClipTitle() + ": 다운로드 성공");
+            } else
+                resultList.add(checkedClipList.get(i).getClipTitle() + ": 다운로드 실패");
+        }
+        return new ResponseEntity<List<String>>(resultList, HttpStatus.OK);
+    }
 }

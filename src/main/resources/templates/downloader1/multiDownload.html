@@ -147,11 +147,13 @@
                         <th scope="col" class="clipsThumbnail clipInfoItem">
                             <img class="clipsThumbnailImg" th:src="${clipInfoDto.getClipThumbnailUrl()}">
                         </th>
-                        <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getClipTitle()}"></th>
+                        <th scope="col" id="clipInfoTitle" class="clipInfoItem" th:text="${clipInfoDto.getClipTitle()}"></th>
                         <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getReadCount()}"></th>
                         <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getLikes()}"></th>
-                        <th scope="col" class="clipInfoItem">
-                            <input class="checkClip" type="checkbox" name="checkClip" th:value="${clipInfoDto.getClipSrcUrl()}">
+                        <th scope="col" id="checkClipInput" class="clipInfoItem">
+                            <input type="hidden" th:value="${clipInfoDto.getVideoId()}">
+                            <input class="checkClip" type="checkbox" th:name="checkClip" th:value="${clipInfoDto.getOriginalUrl()}">
+                            <input type="hidden" th:value="${clipInfoDto.getClipTitle()}">
                         </th>
                     </tr>
                 </tbody>
@@ -170,9 +172,36 @@
 <script>
     /**체크된 클립 멀티 다운로드*/
     $(`#multiDownloadBtn`).click(function (event){
-        const checkedClipList = $("input[name=checkClip]:checked");
-        //체크된 클립들의 원본 srcurl들로 다운로드
-        //ajax로 list를 넘기고, 넘긴 list를 back단에서 받아, 클립갯수만큼 다운로드
+        let checkedClipList = [];
+        const checkClips = $("input[class=checkClip]:checked");
+
+        //형제노드의 클립명
+        checkClips.each((index, item) => {
+            const formData = {
+                originalUrl : checkClips[index].value,
+                clipTitle : checkClips[index].nextElementSibling.value,
+                videoId : checkClips[index].previousElementSibling.value
+            };
+            checkedClipList.push(formData);
+        });
+        $.ajax({
+            type: "post",
+            url: "/multiDownload/clipDownloadDirectMulti",
+            contentType: "application/json",
+            data : JSON.stringify(checkedClipList),
+            success : function (result){
+                let resultText = "";
+                for (let i = 0; i < result.length; i++) {
+                    resultText += result[i] + "\n";
+                }
+                alert(resultText);
+            },
+
+            error:function (error){
+                alert("에러가 발생했습니다.");
+            }
+
+        });
     });
 
     /**전체선택*/
