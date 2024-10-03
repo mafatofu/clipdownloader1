@@ -1,4 +1,6 @@
 spring:
+  thymeleaf:
+    cache: false # 이미 생성된 결과를 서버에서 계속 보관할 것인지에 대한 설정
   datasource:
     url: jdbc:sqlite:db.sqlite
     driver-class-name: org.sqlite.JDBC
