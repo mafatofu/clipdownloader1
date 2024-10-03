@@ -161,6 +161,10 @@
         </div>
         <div id="mainFooter">
             <div></div>
+            <div id="paging">
+                <button>이전 페이지</button>
+                <button>다음 페이지</button>
+            </div>
             <div>
                 <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>
             </div>
@@ -172,36 +176,44 @@
 <script>
     /**체크된 클립 멀티 다운로드*/
     $(`#multiDownloadBtn`).click(function (event){
+
+        //체크된 클립이 없다면 알려주기
+
         let checkedClipList = [];
         const checkClips = $("input[class=checkClip]:checked");
 
-        //형제노드의 클립명
-        checkClips.each((index, item) => {
-            const formData = {
-                originalUrl : checkClips[index].value,
-                clipTitle : checkClips[index].nextElementSibling.value,
-                videoId : checkClips[index].previousElementSibling.value
-            };
-            checkedClipList.push(formData);
-        });
-        $.ajax({
-            type: "post",
-            url: "/multiDownload/clipDownloadDirectMulti",
-            contentType: "application/json",
-            data : JSON.stringify(checkedClipList),
-            success : function (result){
-                let resultText = "";
-                for (let i = 0; i < result.length; i++) {
-                    resultText += result[i] + "\n";
+        if (checkClips.length === 0){
+            alert("체크박스를 하나 이상 선택해주세요!");
+        } else {
+            checkClips.each((index, item) => {
+                const formData = {
+                    originalUrl : checkClips[index].value,
+                    clipTitle : checkClips[index].nextElementSibling.value,//형제노드의 클립명
+                    videoId : checkClips[index].previousElementSibling.value//형제노드의 클립명
+                };
+                checkedClipList.push(formData);
+            });
+            $.ajax({
+                type: "post",
+                url: "/multiDownload/clipDownloadDirectMulti",
+                contentType: "application/json",
+                data : JSON.stringify(checkedClipList),
+                success : function (result){
+                    let resultText = "";
+                    for (let i = 0; i < result.length; i++) {
+                        resultText += result[i] + "\n";
+                    }
+                    alert(resultText);
+                },
+
+                error:function (error){
+                    alert("에러가 발생했습니다.");
                 }
-                alert(resultText);
-            },
 
-            error:function (error){
-                alert("에러가 발생했습니다.");
-            }
+            });
 
-        });
+        }
+
     });
 
     /**전체선택*/
