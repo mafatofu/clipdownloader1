@@ -162,8 +162,12 @@
         <div id="mainFooter">
             <div></div>
             <div id="paging">
-                <button>이전 페이지</button>
-                <button>다음 페이지</button>
+                <form id="otherPageForm" th:action="@{/multiDownload/{streamerName}/{orderType}/otherPage(streamerName=${streamerName}, orderType=${orderType})}" method="get">
+                    <input type="hidden" name="clipUid" th:value="${lastClipUid}">
+                    <input type="hidden" name="readCount" th:value="${lastReadCount}">
+                    <button id="preventPage" type="submit" onclick="pageChange(this)">이전 페이지</button>
+                    <button id="nextPage" type="submit" onclick="pageChange(this)">다음 페이지</button>
+                </form>
             </div>
             <div>
                 <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>
@@ -174,14 +178,53 @@
 
 </body>
 <script>
+
+    //TODO 다음페이지를 가져오는 기준되는  맨 마지막 클립의 uid와 readCount값 확인
+    //값이 비어있다면? 다음페이지 버튼 없애기
+    //1페이지 요청? - 그냥 http://localhost:8080/multiDownload/{streamerName}/POPULAR 요청
+
+    //기본 1페이지
+    let pageCount = 1;
+    const preventPage = document.querySelector("#preventPage");
+    const nextPage = document.querySelector("#nextPage");
+
+    //현재 첫페이지인데 이전버튼클릭 시
+    preventPage.addEventListener('click', function (event){
+        pageCountFunc(preventPage);
+        if (pageCount <= 1){
+            alert("첫페이지입니다!");
+            event.preventDefault();
+        }
+    });
+
+    //마지막 페이지 확인
+    //10개의 클립 요청 후, content - page - next값이 null이라면 다음페이지 없애기
+    preventPage.addEventListener('click', function (event){
+        pageCountFunc(preventPage);
+        if (pageCount <= 1){
+            alert("마지막 페이지입니다!");
+            event.preventDefault();
+        }
+    });
+
+
+    function pageCountFunc(currentPage){
+        //이전페이지라면 페이지카운트 -1 / 다음페이지라면 페이지카운트 +1
+        if (currentPage.id === "preventPage"){
+            pageCount--;
+        } else if (currentPage.id === "nextPage"){
+            pageCount++;
+        }
+
+    }
+
     /**체크된 클립 멀티 다운로드*/
     $(`#multiDownloadBtn`).click(function (event){
-
-        //체크된 클립이 없다면 알려주기
 
         let checkedClipList = [];
         const checkClips = $("input[class=checkClip]:checked");
 
+        //체크된 클립이 없다면 알려주기
         if (checkClips.length === 0){
             alert("체크박스를 하나 이상 선택해주세요!");
         } else {

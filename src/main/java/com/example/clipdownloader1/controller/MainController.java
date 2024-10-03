@@ -74,6 +74,13 @@ public class MainController {
         }
         //결과를 view단으로 넘기기
         model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        model.addAttribute("streamerName", streamerName);
+        model.addAttribute("orderType", orderType);
+        //페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
+        model.addAttribute("lastClipUid",
+                clipInfoDtoList.get(clipInfoDtoList.size()-1).getOriginalUrl());
+        model.addAttribute("lastReadCount",
+                clipInfoDtoList.get(clipInfoDtoList.size()-1).getReadCount());
         return "downloader1/multiDownload";
 
     }
@@ -81,7 +88,10 @@ public class MainController {
     //dto로 front단의 데이터를 받아온다.*/
     @GetMapping("/multiDownload/{streamerName}/{orderType}/otherPage")
     public String streamerClipSearch(
-            StreamerClipSearchDto streamerClipSearchDto,
+            @PathVariable String streamerName,
+            @PathVariable String orderType,
+            @RequestParam(value = "clipUid") String clipUid,
+            @RequestParam(value = "readCount") int readCount,
             Model model
     ) throws Exception {
         //받아온 스트리머명과 정렬기준으로 검색
@@ -89,7 +99,7 @@ public class MainController {
         List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
         try {
             clipInfoDtoList =
-                    clipService.streamerClipSearchService(streamerClipSearchDto);
+                    clipService.streamerClipSearchService(streamerName,orderType, clipUid, readCount);
             statusResult = HttpStatus.OK;
         } catch (Exception e){
             System.out.println("--------------스트리머 검색 에러--------------");
@@ -97,6 +107,15 @@ public class MainController {
         }
         //결과를 view단으로 넘기기
         model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        model.addAttribute("streamerName", streamerName);
+        model.addAttribute("orderType", orderType);
+
+        //페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
+        //TODO
+        model.addAttribute("lastClipUid",
+                clipInfoDtoList.get(clipInfoDtoList.size()-1).getOriginalUrl());
+        model.addAttribute("lastReadCount",
+                clipInfoDtoList.get(clipInfoDtoList.size()-1).getReadCount());
         return "downloader1/multiDownload";
 
     }

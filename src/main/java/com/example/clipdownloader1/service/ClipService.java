@@ -285,6 +285,9 @@ public class ClipService {
         String streamerUid = (String) extractMap.get("channelId");
         //2. 가져온 스트리머 uid로 클립 여러개 가져오기
         //10개를 기준으로 가져오기
+        
+        //TODO 만약 clipUid와 readCount가 있다면 분기
+        
         HttpURLConnection connection2 =
                 httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, 10));
 
@@ -293,15 +296,15 @@ public class ClipService {
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
 
+        //TODO 만약 clipsMapList의 크기가 0이라면? 안에 10개의 클립 요청 후, content - page - next값이 null
+        //이거 확인하여 분기
+
         //videoId랑 클립uid를 사용하는 방법?
 
         //클립uid로 원본 vod url 뽑아오기
 
         //List<dto>로 담기
         for (int i = 0; i < clipsMapList.size(); i++) {
-            //String clipUid = ((String) clipsMapList.get(i).get("clipUID"));
-            //String videoId = ((String) clipsMapList.get(i).get("videoId"));
-            //뽑아온 clipUid와 videoId로 원본 url 찾아오기
 
             ClipInfoDto dto = ClipInfoDto.builder()
                     .originalUrl(((String) clipsMapList.get(i).get("clipUID")))
@@ -320,25 +323,53 @@ public class ClipService {
 
     /**스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립 이전 / 다음페이지 가져오는 서비스*/
     public List<ClipInfoDto> streamerClipSearchService(
-            StreamerClipSearchDto streamerClipSearchDto
+            String streamerName,
+            String orderType,
+            String clipUid,
+            int readCount
     ) throws Exception {
-        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
-        //clipUID와 readCount값을 활용하여 이전 / 다음페이지의 10개 클립 가져오기
-
+        //1. 스트리머 이름으로 uid를 가져온다.
         HttpURLConnection connection =
-                httpUrlConnectSimple(
-                        chzzkUrls.streamerClipSearch(
-                                streamerClipSearchDto.getStreamerUid(),
-                                streamerClipSearchDto.getOrderType(),
-                                10,
-                                streamerClipSearchDto.getClipUID(),
-                                streamerClipSearchDto.getReadCount()
-                        )
-                );
-        //TODO connection으로 가져온 데이터 가공하여 return
-        //map으로 가져온 10개의 클립 데이터를 List<dto>로 받기
-        Map<String, Object> streamerClipInfoMap = jsonDataReceiveToMap(connection);
-        
+                httpUrlConnectSimple(chzzkUrls.streamerSearchUrl(streamerName));
+        Map<String, Object> streamerInfoMap = jsonDataReceiveToMap(connection);
+        //첫번째 연결 종료
+        connection.disconnect();
+        //map에서 uid를 하나 가져오기
+        String uid = "";
+        //2. 스트리머 uid로 검색한 결과를 10개씩 페이징하여 가져옴
+
+        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+        //스트리머 데이터
+        Map<String, Object> extractMap
+                = (Map<String, Object>) ((Map)((List)((Map)streamerInfoMap.get("content")).get("data")).get(0)).get("channel");
+        String streamerUid = (String) extractMap.get("channelId");
+        //2. 가져온 스트리머 uid로 클립 여러개 가져오기
+        //10개를 기준으로 가져오기
+        HttpURLConnection connection2 =
+                httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, 10, clipUid, readCount));
+
+        Map<String, Object> streamerClipsMap = jsonDataReceiveToMap(connection2);
+
+        List<Map<String, Object>> clipsMapList =
+                (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
+
+        //TODO content - page - next값이 null이라면?
+
+
+        //List<dto>로 담기
+        for (int i = 0; i < clipsMapList.size(); i++) {
+
+            ClipInfoDto dto = ClipInfoDto.builder()
+                    .originalUrl(((String) clipsMapList.get(i).get("clipUID")))
+                    .videoId(((String) clipsMapList.get(i).get("videoId")))
+                    .clipThumbnailUrl((String) clipsMapList.get(i).get("thumbnailImageUrl"))
+                    .clipTitle((String) clipsMapList.get(i).get("clipTitle"))
+                    .readCount((Integer) clipsMapList.get(i).get("readCount"))
+                    .build();
+
+            clipInfoDtoList.add(dto);
+        }
+        //TODO 좋아요 개수는 나중에 추가
         return clipInfoDtoList;
     }
 
