@@ -2,6 +2,8 @@ package com.example.clipdownloader1.service;
 
 import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
+import com.example.clipdownloader1.dto.ClipPageDto;
+import com.example.clipdownloader1.dto.NextPageDto;
 import com.example.clipdownloader1.dto.StreamerClipSearchDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.json.JSONParser;
@@ -32,6 +34,8 @@ import java.util.Map;
 public class ClipService {
     private final MainService mainService;
     private final chzzkUrls chzzkUrls;
+    //한번에 가져올 클립들 개수
+    private static int clipSize = 50;
     //스트리머 검색 후 uid를 특정지어 가져올 수 있는 html class
     private static String streamerSearchParticle = "channel_item_wrapper__CT2Qw";
     public WebDriver crawlingStandard(){
@@ -264,10 +268,12 @@ public class ClipService {
      * /multiDownload/{스트리머이름}/{정렬기준}
      * 정렬기준 디폴트는 인기순
      * */
-    public List<ClipInfoDto> streamerClipSearchService(
+    public ClipPageDto streamerClipSearchService(
             String streamerName,
             String orderType
     ) throws Exception {
+        ClipPageDto clipPageDto = new ClipPageDto();
+
         //1. 스트리머 이름으로 uid를 가져온다.
         HttpURLConnection connection =
                 httpUrlConnectSimple(chzzkUrls.streamerSearchUrl(streamerName));
@@ -285,13 +291,23 @@ public class ClipService {
         String streamerUid = (String) extractMap.get("channelId");
         //2. 가져온 스트리머 uid로 클립 여러개 가져오기
         //10개를 기준으로 가져오기
-        
         //TODO 만약 clipUid와 readCount가 있다면 분기
         
         HttpURLConnection connection2 =
-                httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, 10));
+                httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, clipSize));
 
         Map<String, Object> streamerClipsMap = jsonDataReceiveToMap(connection2);
+
+        //다음페이지 호출에 필요한 데이터
+        Map<String, Object> nextPageMap = (Map<String, Object>) ((Map)((Map) streamerClipsMap.get("content")).get("page")).get("next");
+        NextPageDto nextPageDto = new NextPageDto();
+        if (nextPageMap != null){
+            nextPageDto = NextPageDto.builder()
+                    .clipUid((String) nextPageMap.get("clipUID"))
+                    .readCount((Integer) nextPageMap.get("readCount"))
+                    .build();
+        }
+
 
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
@@ -316,18 +332,23 @@ public class ClipService {
 
             clipInfoDtoList.add(dto);
         }
+        //return값 담기
+        clipPageDto.setClipInfoDtoList(clipInfoDtoList);
+        clipPageDto.setNextPageDto(nextPageDto);
         //TODO 좋아요 개수는 나중에 추가
-        return clipInfoDtoList;
+        return clipPageDto;
     }
 
 
     /**스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립 이전 / 다음페이지 가져오는 서비스*/
-    public List<ClipInfoDto> streamerClipSearchService(
+    public ClipPageDto streamerClipSearchService(
             String streamerName,
             String orderType,
             String clipUid,
             int readCount
     ) throws Exception {
+        ClipPageDto clipPageDto = new ClipPageDto();
+
         //1. 스트리머 이름으로 uid를 가져온다.
         HttpURLConnection connection =
                 httpUrlConnectSimple(chzzkUrls.streamerSearchUrl(streamerName));
@@ -346,9 +367,19 @@ public class ClipService {
         //2. 가져온 스트리머 uid로 클립 여러개 가져오기
         //10개를 기준으로 가져오기
         HttpURLConnection connection2 =
-                httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, 10, clipUid, readCount));
+                httpUrlConnectSimple(chzzkUrls.streamerClipSearch(streamerUid, orderType, clipSize, clipUid, readCount));
 
         Map<String, Object> streamerClipsMap = jsonDataReceiveToMap(connection2);
+
+        //다음페이지 호출에 필요한 데이터
+        Map<String, Object> nextPageMap = (Map<String, Object>) ((Map)((Map) streamerClipsMap.get("content")).get("page")).get("next");
+        NextPageDto nextPageDto = new NextPageDto();
+        if (nextPageMap != null){
+            nextPageDto = NextPageDto.builder()
+                    .clipUid((String) nextPageMap.get("clipUID"))
+                    .readCount((Integer) nextPageMap.get("readCount"))
+                    .build();
+        }
 
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
@@ -369,8 +400,11 @@ public class ClipService {
 
             clipInfoDtoList.add(dto);
         }
+        clipPageDto.setClipInfoDtoList(clipInfoDtoList);
+        clipPageDto.setNextPageDto(nextPageDto);
         //TODO 좋아요 개수는 나중에 추가
-        return clipInfoDtoList;
+
+        return clipPageDto;
     }
 
 

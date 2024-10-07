@@ -1,25 +1,20 @@
 package com.example.clipdownloader1.controller;
 
+import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
-import com.example.clipdownloader1.dto.StreamerClipSearchDto;
+import com.example.clipdownloader1.dto.ClipPageDto;
 import com.example.clipdownloader1.service.ClipService;
 import com.example.clipdownloader1.service.FileService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 //테스트용 컨트롤러
 @Controller
@@ -28,6 +23,7 @@ import java.util.Map;
 public class MainController {
     private final ClipService clipService;
     private final FileService fileService;
+    private final chzzkUrls chzzkUrls;
     @GetMapping
     public String home(
             Model model
@@ -61,61 +57,95 @@ public class MainController {
             @PathVariable String orderType,
             Model model
     ) throws Exception {
+        ClipPageDto clipPageDto = new ClipPageDto();
         //받아온 스트리머명과 정렬기준으로 검색
-        HttpStatus statusResult = HttpStatus.NOT_FOUND;
-        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
         try {
-            clipInfoDtoList =
+            clipPageDto =
                     clipService.streamerClipSearchService(streamerName,orderType);
-            statusResult = HttpStatus.OK;
         } catch (Exception e){
             System.out.println("--------------스트리머 검색 에러--------------");
             e.printStackTrace();
         }
         //결과를 view단으로 넘기기
-        model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
         model.addAttribute("streamerName", streamerName);
         model.addAttribute("orderType", orderType);
         //페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
-        model.addAttribute("lastClipUid",
-                clipInfoDtoList.get(clipInfoDtoList.size()-1).getOriginalUrl());
-        model.addAttribute("lastReadCount",
-                clipInfoDtoList.get(clipInfoDtoList.size()-1).getReadCount());
+        model.addAttribute("nextClipUid", clipPageDto.getNextPageDto().getClipUid());
+        model.addAttribute("nextReadCount", clipPageDto.getNextPageDto().getReadCount());
+        //이전페이지 이동을 위한 전 페이지 맨 마지막 클립의 uid와 readCount
+        model.addAttribute("preventClipUid", clipPageDto.getNextPageDto().getClipUid());
+        model.addAttribute("preventReadCount", clipPageDto.getNextPageDto().getReadCount());
+        //이전페이지 이동을 위한 전전 페이지 맨 마지막 클립의 uid와 readCount
+        model.addAttribute("oldClipUid", clipPageDto.getNextPageDto().getClipUid());
+        model.addAttribute("oldReadCount", clipPageDto.getNextPageDto().getReadCount());
+        //페이지카운트
+        model.addAttribute("pageCount", 1);
+
         return "downloader1/multiDownload";
 
     }
     /** 스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립 이전 / 다음페이지
     //dto로 front단의 데이터를 받아온다.*/
-    @GetMapping("/multiDownload/{streamerName}/{orderType}/otherPage")
+    @GetMapping("/multiDownload/{streamerName}/{orderType}/{pageCount}")
     public String streamerClipSearch(
             @PathVariable String streamerName,
             @PathVariable String orderType,
-            @RequestParam(value = "clipUid") String clipUid,
-            @RequestParam(value = "readCount") int readCount,
+            @PathVariable Integer pageCount,
+            //마지막 clip UID
+            @RequestParam(value = "nextClipUid", defaultValue = "notExist", required = false)
+            String nextClipUid,
+            //마지막 clip의 조회수
+            @RequestParam(value = "nextReadCount", defaultValue = "000", required = false)
+            int nextReadCount,
+            //전페이지의 마지막 clip UID
+            @RequestParam(value = "preventClipUid", defaultValue = "notExist", required = false)
+            String preventClipUid,
+            //전페이지의 마지막 clip의 조회수
+            @RequestParam(value = "preventReadCount", defaultValue = "0", required = false)
+            int preventReadCount,
+            //전전페이지의 마지막 clip UID
+            @RequestParam(value = "oldClipUid", defaultValue = "notExist", required = false)
+            String oldClipUid,
+            //전전페이지의 마지막 clip의 조회수
+            @RequestParam(value = "oldReadCount", defaultValue = "0", required = false)
+            int oldReadCount,
+            //이전페이지 or 다음페이지 호출인지 체크
+            @RequestParam(value = "pageCk", defaultValue = "next", required = false)
+            String pageCk,
             Model model
     ) throws Exception {
         //받아온 스트리머명과 정렬기준으로 검색
-        HttpStatus statusResult = HttpStatus.NOT_FOUND;
-        List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
-        try {
-            clipInfoDtoList =
-                    clipService.streamerClipSearchService(streamerName,orderType, clipUid, readCount);
-            statusResult = HttpStatus.OK;
-        } catch (Exception e){
-            System.out.println("--------------스트리머 검색 에러--------------");
-            e.printStackTrace();
+
+        ClipPageDto clipPageDto = new ClipPageDto();
+        //첫페이지 요청 시
+        if (pageCount == 1){
+            clipPageDto =
+                    clipService.streamerClipSearchService(streamerName,orderType);
+        } else {
+            //이전 / 다음페이지 호출 체크
+            if ("prevent".equals(pageCk)){
+                clipPageDto =
+                        clipService.streamerClipSearchService(streamerName,orderType);
+            } else if ("next".equals(pageCk)){
+                clipPageDto =
+                        clipService.streamerClipSearchService(streamerName,orderType,nextClipUid,nextReadCount);
+            }
         }
         //결과를 view단으로 넘기기
-        model.addAttribute("clipInfoDtoList",clipInfoDtoList);
+        //상위 클립 10개 정보
+        model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
+        //스트리머명
         model.addAttribute("streamerName", streamerName);
+        //정렬기준
         model.addAttribute("orderType", orderType);
-
-        //페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
-        //TODO
-        model.addAttribute("lastClipUid",
-                clipInfoDtoList.get(clipInfoDtoList.size()-1).getOriginalUrl());
-        model.addAttribute("lastReadCount",
-                clipInfoDtoList.get(clipInfoDtoList.size()-1).getReadCount());
+        //다음 페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
+        model.addAttribute("nextClipUid", clipPageDto.getNextPageDto().getClipUid());
+        model.addAttribute("nextReadCount", clipPageDto.getNextPageDto().getReadCount());
+        //페이지카운트
+        model.addAttribute("pageCount", pageCount);
+        //클립 url src
+        model.addAttribute("clipUrlSrc", chzzkUrls.clipUrlSrc());
         return "downloader1/multiDownload";
 
     }

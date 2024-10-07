@@ -56,7 +56,12 @@ public class chzzkUrls {
     public String clipUrl(
             String clipUid
     ){
-        return "https://chzzk.naver.com/clips/og5Bsv3XM1" + clipUid;
+        return "https://chzzk.naver.com/clips/" + clipUid;
+    }
+
+    /**치지직 클립주소 src*/
+    public String clipUrlSrc(){
+        return "https://chzzk.naver.com/clips/";
     }
 
     /**clipUid와 videoId로 원본 video url요청*/
