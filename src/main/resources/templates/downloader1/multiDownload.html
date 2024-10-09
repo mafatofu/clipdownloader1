@@ -83,10 +83,23 @@
         }
         #selectAll{
             zoom: 2;
-            margin-left: 85%;
+            flex-basis: 15%;
             margin-bottom: 3%;
         }
+        #clipsControl{
+            display: flex;
+            justify-content: space-between;
+        }
+        #clipsOrderControl{
+            display: flex;
+            justify-content: space-around;
+            height: 70%;
+        }
+        #popularOrderBtn{
+        }
+        #recentOrderBtn{
 
+        }
     </style>
 </head>
 <body>
@@ -127,6 +140,13 @@
             </div>
         </div>
         <div id="clips">
+            <div id="clipsControl">
+                <div id="clipsOrderControl">
+                    <button type="button" id="popularOrderBtn" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
+                    <button type="button" id="recentOrderBtn" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
+                </div>
+                <input id="selectAll" type="checkbox" name="checkClip" onclick="selectAll(this)">
+            </div>
             <table th:if="${clipInfoDtoList.isEmpty()}" class="clipTable">
                 비어있습니다.
             </table>
@@ -143,7 +163,7 @@
                 </thead>
                 <tbody id="clipTableBody">
                     <tr>
-                        <input id="selectAll" type="checkbox" name="checkClip" onclick="selectAll(this)">
+
                     </tr>
                     <tr class="clipInfo" th:each="clipInfoDto: ${clipInfoDtoList}">
                         <th scope="col" class="clipsThumbnail clipInfoItem">
@@ -199,14 +219,12 @@
 
 </body>
 <script th:inline="javascript">
+    //정렬타입을 가져온다. 해당정렬타입의 버튼 색상 바꾸기
+    const orderType = [[${orderType}]];
+    const orderTypeBtn = document.getElementsByName(orderType.toString());
+    orderTypeBtn[0].style.cssText='color : aliceblue';
 
-    //TODO 다음페이지를 가져오는 기준되는  맨 마지막 클립의 uid와 readCount값 확인
-    //값이 비어있다면? 다음페이지 버튼 없애기
-    //1페이지 요청? - 그냥 http://localhost:8080/multiDownload/{streamerName}/POPULAR 요청
-
-    //기본 1페이지
-    //TODO 페이지가 로드되는 방식이다 보니, pageCount도 back에 보내고 가져와줘야함
-    let orderType = [[${orderType}]];
+    const streamerName = [[${streamerName}]];
     let pageCount = [[${pageCount}]];
     const  nextClipUid = [[${nextClipUid}]];
 
@@ -234,6 +252,19 @@
             event.preventDefault();
         }
     });
+
+    /**페이지 정렬(인기순/최신순)*/
+    function clipSorting(sortType){
+        location.href = "/multiDownload/"+streamerName+"/"+sortType.name;
+    }
+    // $(`.orderBtn`).click(function (event){
+    //     //클릭한 오더타입
+    //     console.log(this);
+    //     //const orderType =
+    //     //location.href = "/multiDownload/"+streamerName+"/"+orderType.toString();
+    // });
+
+
 
 
     /**체크된 클립 멀티 다운로드*/

@@ -302,10 +302,19 @@ public class ClipService {
         Map<String, Object> nextPageMap = (Map<String, Object>) ((Map)((Map) streamerClipsMap.get("content")).get("page")).get("next");
         NextPageDto nextPageDto = new NextPageDto();
         if (nextPageMap != null){
-            nextPageDto = NextPageDto.builder()
-                    .clipUid((String) nextPageMap.get("clipUID"))
-                    .readCount((Integer) nextPageMap.get("readCount"))
-                    .build();
+            //정렬기준이 최신순이면, 다음페이지 호출에 필요한 데이터에 readCount라는 값이 없다
+            if ("RECENT".equals(orderType)){
+                nextPageDto = NextPageDto.builder()
+                        .clipUid((String) nextPageMap.get("clipUID"))
+                        .readCount(0)
+                        .build();
+            } else if ("POPULAR".equals(orderType)) {
+                nextPageDto = NextPageDto.builder()
+                        .clipUid((String) nextPageMap.get("clipUID"))
+                        .readCount((Integer) nextPageMap.get("readCount"))
+                        .build();
+            }
+
         }
 
 
@@ -375,10 +384,18 @@ public class ClipService {
         Map<String, Object> nextPageMap = (Map<String, Object>) ((Map)((Map) streamerClipsMap.get("content")).get("page")).get("next");
         NextPageDto nextPageDto = new NextPageDto();
         if (nextPageMap != null){
-            nextPageDto = NextPageDto.builder()
-                    .clipUid((String) nextPageMap.get("clipUID"))
-                    .readCount((Integer) nextPageMap.get("readCount"))
-                    .build();
+            //정렬기준이 최신순이면, 다음페이지 호출에 필요한 데이터에 readCount라는 값이 없다
+            if ("RECENT".equals(orderType)){
+                nextPageDto = NextPageDto.builder()
+                        .clipUid((String) nextPageMap.get("clipUID"))
+                        .readCount(0)
+                        .build();
+            } else if ("POPULAR".equals(orderType)) {
+                nextPageDto = NextPageDto.builder()
+                        .clipUid((String) nextPageMap.get("clipUID"))
+                        .readCount((Integer) nextPageMap.get("readCount"))
+                        .build();
+            }
         }
 
         List<Map<String, Object>> clipsMapList =

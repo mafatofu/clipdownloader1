@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +71,7 @@ public class MainController {
         //결과를 view단으로 넘기기
         model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
         model.addAttribute("streamerName", streamerName);
+        model.addAttribute("streamerNameUtf8", URLEncoder.encode(streamerName, StandardCharsets.UTF_8));
         model.addAttribute("orderType", orderType);
         //페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
         model.addAttribute("nextClipUid", clipPageDto.getNextPageDto().getClipUid());
