@@ -32,9 +32,6 @@
             visibility: hidden;
         }
         #clipInfo{
-
-        }
-        #clipInfo{
             color: aliceblue;
             display: flex;
             justify-content: space-between;
@@ -95,12 +92,29 @@
             justify-content: space-around;
             height: 70%;
         }
-        #popularOrderBtn{
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            transition: 0.5s ease;
+            text-align: center;
+            display: none;
         }
-        #recentOrderBtn{
-
+        .loadingImg {
+            position: relative;
+            top: 50vh;
+            transform: translateY(-50%);
         }
-    </style>
+        .loadingText{
+            position: relative;
+            top: 35vh;
+            color: aliceblue;
+        }
+</style>
 </head>
 <body>
     <div id="mainLeft"></div>
@@ -214,6 +228,12 @@
                 <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>
             </div>
         </div>
+        <!-- 로딩 화면 -->
+        <div class="mask">
+            <img class="loadingImg" src='/img/roeunFox1.gif'>
+            <p class="loadingText">로딩중입니다....기다료봥~</p>
+        </div>
+        <!-- 로딩화면 끝 -->
     </div>
     <div id="mainRight"></div>
 
@@ -279,6 +299,7 @@
         } else {
             //진짜 다운로드 할건지 한번 더 확인
             let downloadCk = confirm("다운로드 하시겠습니까?");
+            //취소누르면 return
             if (!downloadCk){
                 return;
             }
@@ -290,17 +311,27 @@
                 };
                 checkedClipList.push(formData);
             });
+            //다운로드중 로딩화면 구현
+            const mask = document.querySelector('.mask');
+            const html = document.querySelector('html');
+            mask.style.display = 'block'; //로딩중 보여주기
+            html.style.overflow = 'hidden'; //로딩 중 스크롤 방지
+
             $.ajax({
                 type: "post",
                 url: "/multiDownload/clipDownloadDirectMulti",
                 contentType: "application/json",
                 data : JSON.stringify(checkedClipList),
                 success : function (result){
-                    let resultText = "";
-                    for (let i = 0; i < result.length; i++) {
-                        resultText += result[i] + "\n";
-                    }
-                    alert(resultText);
+                    // let resultText = "";
+                    // for (let i = 0; i < result.length; i++) {
+                    //     resultText += result[i] + "\n";
+                    // }
+                    //alert(resultText);
+                    alert("다운로드 완료되었습니다!");
+                    mask.style.opacity = '0'; //서서히 사라지는 효과
+                    html.style.overflow = 'auto'; //스크롤 방지 해제
+                    mask.style.display = 'none';
                 },
 
                 error:function (error){
