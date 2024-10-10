@@ -132,8 +132,10 @@
             </form>
             <div id="videoNone">
                 <div id="notice">
-                    <p>올바른 클립 주소 입력 시<br>아래에 다운로드 가능한 영상이 나타납니다.</p>
-                    <p>클립은 C드라이브 내 "chzzkClip" 폴더 내로 저장됩니다(다운로드시 폴더 자동 생성)</p>
+                    <p>치지직 클립 다운로더 페이지입니다.</p>
+                    <p>1. 클립 주소 / 스트리머 이름으로 검색 가능합니다.</p>
+                    <p>2. 스트리머 이름 입력 시 새 창에 영상들이 나타납니다.</p>
+                    <p>3. 클립은 C드라이브 내 "chzzkClip" 폴더 내로 저장됩니다(다운로드시 폴더 자동 생성)</p>
                 </div>
             </div>
             <div id="clipInfo">
@@ -231,7 +233,7 @@
         <!-- 로딩 화면 -->
         <div class="mask">
             <img class="loadingImg" src='/img/roeunFox1.gif'>
-            <p class="loadingText">로딩중입니다....기다료봥~</p>
+            <p class="loadingText">다운로드중입니다....기다료봥~</p>
         </div>
         <!-- 로딩화면 끝 -->
     </div>
@@ -355,7 +357,7 @@
     }
     //각각의 클립의 다운로드 버튼을 누르면, 각각의 클립이 다운로드 가능하다
     //원본 url로
-    $(`.clipDownloadDirectBtn`).click(function (event){
+    $(`#clipDownloadDirectBtn`).click(function (event){
         event.preventDefault();
         //TODO 원본 vod 주소 따로
         let clipSrcUrl = $('#clipVideo').attr('src');
@@ -367,7 +369,7 @@
         };
         $.ajax({
             type: "post",
-            url: "clipDownloadDirect",
+            url: "/clipDownloadDirect",
             contentType: "application/json",
             data : JSON.stringify(formData),
             success : function (result){
