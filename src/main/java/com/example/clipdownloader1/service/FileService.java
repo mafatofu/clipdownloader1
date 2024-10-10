@@ -60,10 +60,10 @@ public class FileService {
         }
         //파일 다운로드
         try(InputStream in = new URL(clipInfoDto.getClipSrcUrl()).openStream()){
-            System.out.println(LocalDateTime.now().format(dtf)+" : -------------파일 다운로드 시작!-------------");
+            System.out.println(LocalDateTime.now().format(dtf)+" : -------------"+clipTitle+" 다운로드 시작!-------------");
             Files.copy(in, clipPath);
             result = 1;
-            System.out.println(LocalDateTime.now().format(dtf)+" : -------------파일 다운로드 완료!-------------");
+            System.out.println(LocalDateTime.now().format(dtf)+" : -------------다운로드 완료!-------------");
         } catch (MalformedURLException e) {
             System.out.println("영상가져오는데 에러!");
             throw new RuntimeException(e);
