@@ -277,6 +277,11 @@
         if (checkClips.length === 0){
             alert("체크박스를 하나 이상 선택해주세요!");
         } else {
+            //진짜 다운로드 할건지 한번 더 확인
+            let downloadCk = confirm("다운로드 하시겠습니까?");
+            if (!downloadCk){
+                return;
+            }
             checkClips.each((index, item) => {
                 const formData = {
                     originalUrl : checkClips[index].value,
