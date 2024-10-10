@@ -30,10 +30,7 @@ import java.time.format.DateTimeFormatter;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-    private final ClipRepo clipRepo;
-    private final ClipService clipService;
-
-    /**크롤링해온 클립 링크를 바로 다운로드하는 기능(240924 현재 다운로드 안됨)*/
+    /**클립 링크를 바로 다운로드하는 기능*/
     @Value("${spring.servlet.multipart.location}")
     String location;
     public int chzzkClipDirectDownload(
