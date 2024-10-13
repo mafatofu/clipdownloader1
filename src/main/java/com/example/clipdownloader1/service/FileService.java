@@ -58,6 +58,7 @@ public class FileService {
         //파일 다운로드
         try(InputStream in = new URL(clipInfoDto.getClipSrcUrl()).openStream()){
             System.out.println(LocalDateTime.now().format(dtf)+" : -------------"+clipTitle+" 다운로드 시작!-------------");
+            System.out.println("---------다운로드 경로: "+clipPath+"---------");
             Files.copy(in, clipPath);
             result = 1;
             System.out.println(LocalDateTime.now().format(dtf)+" : -------------다운로드 완료!-------------");
