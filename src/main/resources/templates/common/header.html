@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="headerFragment">
-    <meta charset="UTF-8">
+    <!--https환경에서 juery사용 불가 해제-->
+    <meta charset="UTF-8" http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title>치지직 클립다운로드</title>
     <!-- teamplate : viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
