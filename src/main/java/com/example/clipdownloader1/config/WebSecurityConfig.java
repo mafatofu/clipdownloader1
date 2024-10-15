@@ -42,7 +42,9 @@ public class WebSecurityConfig {
                                         "/css/**",
                                         "/js/**",
                                         "/fonts/**",
-                                        "/img/**"
+                                        "/img/**",
+                                        //클립 관련
+                                        "/tempClips/**"
                                 ).permitAll()
                 );
         return http.build();

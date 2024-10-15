@@ -5,14 +5,26 @@ import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.ClipPageDto;
 import com.example.clipdownloader1.service.ClipService;
 import com.example.clipdownloader1.service.FileService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.jsoup.HttpStatusException;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -22,6 +34,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/")
+@Slf4j
 public class MainController {
     private final ClipService clipService;
     private final FileService fileService;
@@ -154,20 +167,21 @@ public class MainController {
     }
 
 
-    /**다운로드 버튼 클릭 시 PC에 바로 저장 컨트롤러*/
-    @PostMapping("/clipDownloadDirect")
+    /**
+     * 다운로드 버튼 클릭 시 PC에 바로 저장 컨트롤러
+     */
+    @GetMapping(value="/clipDownloadDirect", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
-    public ResponseEntity<Integer> clipDownloadDirect(
-            @RequestBody ClipInfoDto clipInfoDto
+    public ResponseEntity<Resource> clipDownloadDirect(
+            @RequestParam String clipSrcUrl,
+            @RequestParam String clipTitle
     ) throws IOException {
-        HttpStatus statusResult = HttpStatus.NOT_FOUND;
-        //service단의 결과에 따라 분기하기
-        int result = fileService.chzzkClipDirectDownload(clipInfoDto);
-        if (result == 1)
-            statusResult = HttpStatus.OK;
-
-        return new ResponseEntity<Integer>(result, statusResult);
+        ResponseEntity<Resource> responseEntity;
+        responseEntity = fileService.chzzkClipDirectDownloadToProject(clipSrcUrl, clipTitle);
+        return responseEntity;
     }
+
+
 
     /**여러 개의 클립을 한 번에 다운로드 컨트롤러*/
     @PostMapping("/multiDownload/clipDownloadDirectMulti")
@@ -184,12 +198,10 @@ public class MainController {
             //클립 srcUrl 가져와야 함
             checkedClipList.get(i).setClipSrcUrl(
                     clipService.findVodUrl(checkedClipList.get(i).getOriginalUrl(), checkedClipList.get(i).getVideoId()));
-            downloadResult = fileService.chzzkClipDirectDownload(checkedClipList.get(i));
+            //downloadResult = fileService.chzzkClipDirectDownload(checkedClipList.get(i));
+            //TODO 여러개의 responseEntity를 어떻게 돌려줘야하는가?
+            //downloadResult = fileService.chzzkClipDirectDownloadToProject(checkedClipList.get(i));
             //다운로드 성공
-            if (downloadResult == 1){
-                resultList.add(checkedClipList.get(i).getClipTitle() + ": 다운로드 성공");
-            } else
-                resultList.add(checkedClipList.get(i).getClipTitle() + ": 다운로드 실패");
         }
         return new ResponseEntity<List<String>>(resultList, HttpStatus.OK);
     }

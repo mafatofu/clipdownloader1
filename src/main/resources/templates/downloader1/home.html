@@ -24,9 +24,9 @@
             width: 500px;
             height: 30px;
         }
-        #clipDownloadDirectBtn{
-            visibility: hidden;
-        }
+        /*#clipDownloadDirectBtn{*/
+        /*    visibility: hidden;*/
+        /*}*/
         #clipInfo{
             color: aliceblue;
         }
@@ -69,8 +69,10 @@
                     <span id="clipCreatedTime"></span><br>
                 </div>
                 <div id="clipDownloadDirect">
-                    <button class="btn btn-primary" id="clipDownloadDirectBtn" type="button">다운로드</button>
+<!--                    <button class="btn btn-primary" id="clipDownloadDirectBtn" type="button">다운로드</button>-->
+                    <a id="clipDownloadDirectAnchor" href="">다운로드</a>
                 </div>
+
             </div>
             <div id="videoOn">
                 <video id="clipVideo" controls="">
@@ -82,34 +84,33 @@
     <div id="mainRight"></div>
 </body>
 <script>
-    $(`#clipDownloadDirectBtn`).click(function (event){
-        event.preventDefault();
-        //원본 vod 주소
-        let clipSrcUrl = $('#clipVideo').attr('src');
-        let clipTitle = $('#clipVideo').attr('name');
-        //클립명
-        const formData = {
-            clipSrcUrl : clipSrcUrl,
-            clipTitle : clipTitle
-        };
-        $.ajax({
-            type: "post",
-            url: "clipDownloadDirect",
-            contentType: "application/json",
-            data : JSON.stringify(formData),
-            success : function (result){
-                if (result === 0){
-                    alert("에러가 발생했습니다. 클립주소를 확인해주세요!");
-                } else if (result === 1){
-                    alert("클립이 다운로드되었습니다!");
-                }
-            },
-            error:function (error){
-                alert("에러가 발생했습니다.");
-            }
-
-        });
-    });
+    // $(`#clipDownloadDirectBtn`).click(function (event){
+    //     event.preventDefault();
+    //     //원본 vod 주소
+    //     let clipSrcUrl = $('#clipVideo').attr('src');
+    //     let clipTitle = $('#clipVideo').attr('name');
+    //     //클립명
+    //     const formData = {
+    //         clipSrcUrl : clipSrcUrl,
+    //         clipTitle : clipTitle
+    //     };
+    //     $.ajax({
+    //         type: "get",
+    //         url: "clipDownloadDirect",
+    //         contentType: "application/json",
+    //         data : {
+    //             clipSrcUrl : clipSrcUrl,
+    //             clipTitle : clipTitle
+    //         },
+    //         success : function (result){
+    //
+    //         },
+    //         error:function (error){
+    //             alert("에러가 발생했습니다.");
+    //         }
+    //
+    //     });
+    // });
 
     $('#searchBtn').click(function (event){
         event.preventDefault();
@@ -132,7 +133,7 @@
                         //비디오 보여주기
                         document.getElementById("videoOn").style.display = 'block';
                         document.getElementById("videoNone").style.display = 'none';
-                        document.getElementById("clipDownloadDirectBtn").style.visibility = 'visible';
+                        // document.getElementById("clipDownloadDirectBtn").style.visibility = 'visible';
                         //video태그의 src부분 채워주기
                         $("#clipVideo").attr("src", result.clipSrcUrl);
                         $("#clipVideo").attr("name", result.clipTitle);
@@ -150,7 +151,9 @@
                         clipCreatedTime.text("클립 생성 시간 : " + result.createdDateTime);
                         //뿌려준 값들 중, 제목은 '다운로드' 버튼 클릭 시 clipSrcUrl과 함께 back단으로 넘기기
 
-
+                        //다운로드 앵커 링크 만들어주기
+                        document.getElementById("clipDownloadDirectAnchor").href =
+                            "clipDownloadDirect"+"?clipSrcUrl="+result.clipSrcUrl+"&clipTitle="+result.clipTitle;
                     },
                     error:function (error){
                         alert("에러가 발생했습니다. 클립주소를 확인해주세요!" + error);
