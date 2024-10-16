@@ -51,7 +51,8 @@ dependencies {
 
     // json < - >Map으로 변경용 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
-
+    //devtool. 정적자원 새로고침없이 적용위해 깜
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 tasks.named('test') {
