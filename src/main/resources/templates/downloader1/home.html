@@ -39,6 +39,20 @@
             visibility: hidden;
         }
 
+        #clipDownloadDirectAnchor:link, #clipDownloadDirectAnchor:visited {
+            background-color: #21242a;
+            color: aliceblue;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border: 1px solid aliceblue;
+            border-radius: 10px;
+        }
+        #clipDownloadDirectAnchor:hover, #clipDownloadDirectAnchor:active {
+            background-color: #6c757d;
+        }
+
 
     </style>
 </head>
@@ -152,7 +166,15 @@
                         streamer.text("스트리머 : " + result.streamer);
                         clipperName.text("클립퍼 : " + result.clipperName);
                         clipTitle.text("클립 제목 : " + result.clipTitle);
-                        clipCreatedTime.text("클립 생성 시간 : " + result.createdDateTime);
+                        clipCreatedTime.text(
+                            "클립 생성 일자 : "
+                            + result.createdDateTime[0]
+                            +"/"+result.createdDateTime[1]
+                            +"/"+result.createdDateTime[2]
+                            +" "+result.createdDateTime[3]
+                            +":"+result.createdDateTime[4]
+                            +":"+result.createdDateTime[5]
+                        );
                         //뿌려준 값들 중, 제목은 '다운로드' 버튼 클릭 시 clipSrcUrl과 함께 back단으로 넘기기
 
                         //다운로드 앵커 링크 만들어주기
