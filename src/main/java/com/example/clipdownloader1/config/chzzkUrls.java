@@ -64,6 +64,12 @@ public class chzzkUrls {
         return "https://chzzk.naver.com/clips/";
     }
 
+    /**치지직 하나의 클립 관련 정보들을 나타내주는 api주소*/
+    public String takeClipInfoUrl(String clipUid){
+        return "https://api.chzzk.naver.com/service/v1/clips/"
+                +clipUid+"/detail?optionalProperties=COMMENT";
+    }
+
     /**clipUid와 videoId로 원본 video url요청*/
     public String takeSrcUrl(
             String clipUid,
