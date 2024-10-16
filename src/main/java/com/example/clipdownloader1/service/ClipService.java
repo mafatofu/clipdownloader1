@@ -197,7 +197,7 @@ public class ClipService {
         String[] clipUrlSplit = clipUrl.split("/");
         String clipUid = clipUrlSplit[clipUrlSplit.length - 1];
         //추출한 clipId로 url요청
-        String takeVideoUrl = chzzkUrls.takeClipInfoUrl(clipUrl);
+        String takeVideoUrl = chzzkUrls.takeClipInfoUrl(clipUid);
         //첫번째 요청
         HttpURLConnection connection = httpUrlConnectSimple(takeVideoUrl);
         //요청으로 받은 json data를 map으로 받음
