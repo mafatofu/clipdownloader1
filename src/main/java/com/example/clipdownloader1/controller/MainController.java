@@ -59,7 +59,9 @@ public class MainController {
     }
     /**한 명의 치지직 스트리머 이름을 입력창에 입력시,
      해당하는 스트리머의 클립들이 모두 나타남
-     나타난 클립들을 다운로드*/
+     나타난 클립들을 다운로드
+     로컬상에서만 다운 가능
+     */
     @GetMapping("/multiDownload")
     public String multiDownload(){
         return "downloader1/multiDownload";
@@ -180,6 +182,20 @@ public class MainController {
         responseEntity = fileService.chzzkClipDirectDownloadToProject(clipSrcUrl, clipTitle);
         return responseEntity;
     }
+    /**다운로드 버튼 클릭 시 PC에 클립 저장 컨트롤러
+     * clipUid를 받아옴
+     * */
+    @GetMapping(value="/clipDownloadDirect/{clipUid}")
+    @ResponseBody
+    public ResponseEntity<Resource> clipDownloadDirect(
+            @PathVariable String clipUid
+    ) throws Exception {
+        ClipInfoDto dto = clipService.chzzkClipInfoTakeUsingUid(clipUid);
+        ResponseEntity<Resource> responseEntity;
+        responseEntity = fileService.chzzkClipDirectDownloadToProject(dto.getClipSrcUrl(), dto.getClipTitle());
+        return responseEntity;
+    }
+
 
 
 

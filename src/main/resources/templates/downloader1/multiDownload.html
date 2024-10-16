@@ -114,6 +114,20 @@
             top: 35vh;
             color: aliceblue;
         }
+        .clipDownloadDirectAnchor:link, .clipDownloadDirectAnchor:visited {
+            background-color: #21242a;
+            color: aliceblue;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            border: 1px solid aliceblue;
+            border-radius: 10px;
+        }
+        .clipDownloadDirectAnchor:hover, .clipDownloadDirectAnchor:active {
+            background-color: #6c757d;
+        }
+
 </style>
 </head>
 <body>
@@ -161,7 +175,7 @@
                     <button type="button" id="popularOrderBtn" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
                     <button type="button" id="recentOrderBtn" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
                 </div>
-                <input id="selectAll" type="checkbox" name="checkClip" onclick="selectAll(this)">
+<!--                <input id="selectAll" type="checkbox" name="checkClip" onclick="selectAll(this)">-->
             </div>
             <table th:if="${clipInfoDtoList.isEmpty()}" class="clipTable">
                 비어있습니다.
@@ -192,9 +206,10 @@
                         <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getReadCount()}"></th>
                         <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getLikes()}"></th>
                         <th scope="col" id="checkClipInput" class="clipInfoItem">
-                            <input type="hidden" th:value="${clipInfoDto.getVideoId()}">
-                            <input class="checkClip" type="checkbox" th:name="checkClip" th:value="${clipInfoDto.getOriginalUrl()}">
-                            <input type="hidden" th:value="${clipInfoDto.getClipTitle()}">
+                            <a class="clipDownloadDirectAnchor" th:href="@{/clipDownloadDirect/{clipUid}(clipUid=${clipInfoDto.getOriginalUrl()})}">다운로드</a>
+<!--                            <input type="hidden" th:value="${clipInfoDto.getVideoId()}">-->
+<!--                            <input class="checkClip" type="checkbox" th:name="checkClip" th:value="${clipInfoDto.getOriginalUrl()}">-->
+<!--                            <input type="hidden" th:value="${clipInfoDto.getClipTitle()}">-->
                         </th>
                     </tr>
                 </tbody>
@@ -205,17 +220,6 @@
             <div></div>
             <div id="paging" class="d-flex justify-content-center mt-3">
                 <ui class="paging">
-                    <!--만약 이전 preventLastClipUid값과 preventLastReadCount값이 존재한다면-->
-<!--                    <li class="pageItem">-->
-<!--                        <form class="pageForm" th:action="@{/multiDownload/{streamerName}/{orderType}/{pageCount}(streamerName=${streamerName}, orderType=${orderType}, pageCount=${pageCount - 1})}" method="get">-->
-<!--                            <input type="hidden" name="oldClipUid" th:value="${oldClipUid}">-->
-<!--                            <input type="hidden" name="oldReadCount" th:value="${oldReadCount}">-->
-<!--                            <input type="hidden" name="preventClipUid" th:value="${preventClipUid}">-->
-<!--                            <input type="hidden" name="preventReadCount" th:value="${preventReadCount}">-->
-<!--                            <input type="hidden" name="pageCk" value="prevent">-->
-<!--                            <button id="preventPage" type="submit" onclick="pageChange(this)">이전 페이지</button>-->
-<!--                        </form>-->
-<!--                    </li>-->
                     <li th:if="${nextClipUid} ne null" class="pageItem">
                         <form class="pageForm" th:action="@{/multiDownload/{streamerName}/{orderType}/{pageCount}(streamerName=${streamerName}, orderType=${orderType}, pageCount=${pageCount + 1})}" method="get">
                             <input type="hidden" name="nextClipUid" th:value="${nextClipUid}">
@@ -227,7 +231,7 @@
                 </ui>
             </div>
             <div>
-                <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>
+<!--                <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>-->
             </div>
         </div>
         <!-- 로딩 화면 -->

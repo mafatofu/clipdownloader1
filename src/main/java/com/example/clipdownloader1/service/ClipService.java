@@ -172,8 +172,6 @@ public class ClipService {
         HttpURLConnection connection = httpUrlConnectSimple(takeSrcUrl);
         String jsonString = ConnectionDataToString(connection);
         Map<String, Object> takeVideoMap = mainService.jsonToMap(jsonString);
-        //JSONObject jsonObject = new JSONObject(jsonString);
-
         //여러겹으로 둘러쌓인 데이터 풀어내어, 원본 영상 url 뽑아내기
         String clipSrcUrl =
                 (String) ((Map)(((List)((Map)((Map)((Map)((Map)((Map)takeVideoMap.get("card"))
@@ -186,7 +184,9 @@ public class ClipService {
 
 
 
-    //@Value("${spring.servlet.multipart.location}")
+
+    /**클립 관련 정보들을 가져와주는 기능.
+     * 클립 전체 Url을 받는다.*/
     String location;
     public ClipInfoDto chzzkClipInfoTake(
             String clipUrl
@@ -197,8 +197,7 @@ public class ClipService {
         String[] clipUrlSplit = clipUrl.split("/");
         String clipUid = clipUrlSplit[clipUrlSplit.length - 1];
         //추출한 clipId로 url요청
-        String takeVideoUrl = "https://api.chzzk.naver.com/service/v1/clips/"
-                                +clipUid+"/detail?optionalProperties=COMMENT";
+        String takeVideoUrl = chzzkUrls.takeClipInfoUrl(clipUrl);
         //첫번째 요청
         HttpURLConnection connection = httpUrlConnectSimple(takeVideoUrl);
         //요청으로 받은 json data를 map으로 받음
@@ -261,6 +260,77 @@ public class ClipService {
 
         return clipInfoDto;
     }
+    /**클립 관련 정보들을 가져와주는 기능.
+     * 클립UID를 받는다.*/
+    public ClipInfoDto chzzkClipInfoTakeUsingUid(
+            String clipUid
+    ) throws Exception {
+        //return용 DTO
+        ClipInfoDto clipInfoDto = new ClipInfoDto();
+        //추출한 clipId로 url요청
+        String takeVideoUrl = chzzkUrls.takeClipInfoUrl(clipUid);
+        //첫번째 요청
+        HttpURLConnection connection = httpUrlConnectSimple(takeVideoUrl);
+        //요청으로 받은 json data를 map으로 받음
+        Map<String, Object> takeVideoMap = jsonDataReceiveToMap(connection);
+        //클립 제목
+        String clipTitle = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("clipTitle");
+        //썸네일 url
+        String thumbnailImageUrl = (String) ((HashMap<?, ?>)takeVideoMap.get("content")).get("thumbnailImageUrl");
+        //만든날짜
+        String createdDate = ((HashMap<?, ?>) takeVideoMap.get("content")).get("createdDate").toString();
+        //2023-12-19 22:45:20
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime createdDateTime = LocalDateTime.parse(createdDate, dtf);
+
+        //추출한 videoId
+        String videoId = ((HashMap<?, ?>) takeVideoMap.get("content")).get("videoId").toString();
+        //추출한 videoId로 원본 video url요청
+        String takeSrcUrl = "https://m.naver.com/shorts/?mediaId="+videoId+
+                "&serviceType=CHZZK&mediaType=&recType=CHZZK&recId=%7B%22seedClipUID%22%3A%22"+clipUid+
+                "%22%2C%22fromType%22%3A%22GLOBAL%22%2C%22listType%22%3A%22RECOMMEND%22%7D&b" +
+                "logId=&docNo=&adAllowed=Y&feedBlock=&enableReverse=false" +
+                "&notInterestedMediaIds=&notInterestedChannelIds=&panelType=sdk_chzzk" +
+                "&entryPoint=&stmsId=&clickNsc=chzzk_url_clip" +
+                "&clickArea=clip_item&adUnitId=chzzk_shortformviewer_web&viewerInfo=chzzk_shortformviewer_web" +
+                "&adCtrl=P&theme=light&viewMode=mobile&sdkTargetId=PLAYER-SDK-0-45&env=&embed=true";
+
+        //두번째 요청
+        HttpURLConnection connection2 = httpUrlConnectSimple(takeSrcUrl);
+        //재사용을 위한 비우기
+        takeVideoMap.clear();
+
+        //요청으로 받은 connection data에서 원본 클립 주소가 들어있는 json부분만 String으로 받음
+        //json형태의 String을 map으로 받음
+        String jsonString = ConnectionDataToString(connection2);
+        takeVideoMap = mainService.jsonToMap(jsonString);
+        //여러겹으로 둘러쌓인 데이터 풀어내어, 원본 영상 url 뽑아내기
+        String clipSrcUrl =
+                (String) ((Map)(((List)((Map)((Map)((Map)((Map)((Map)takeVideoMap.get("card"))
+                        .get("content")).get("vod")).get("playback")).get("videos"))
+                        .get("list"))).get(0)).get("source");
+        //스트리머이름
+        String streamer = (String) ((Map)((List)((Map)
+                takeVideoMap.get("card")).get("shortFormBanners")).get(0)).get("title");
+        //클리퍼 닉네임
+        String clipperName = (String) ((Map)((Map)(((Map)
+                takeVideoMap.get("card")).get("interaction"))).get("subscription")).get("name");
+        //srcUrl 클립제목 썸네일 스트리머이름 클립 딴사람이름 싹다 묶어서 dto로
+
+        clipInfoDto.setClipSrcUrl(clipSrcUrl);
+        clipInfoDto.setStreamer(streamer);
+        clipInfoDto.setClipperName(clipperName);
+        clipInfoDto.setOriginalUrl(chzzkUrls.clipUrl(clipUid));
+        clipInfoDto.setClipTitle(clipTitle);
+        clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
+        clipInfoDto.setCreatedDateTime(createdDateTime);
+
+        //연결종료
+        connection.disconnect();
+        connection2.disconnect();
+
+        return clipInfoDto;
+    }
 
 
     /**스트리머 이름 검색 시 정렬기준에 따른 10개의 상위 클립을 가져옴
@@ -317,20 +387,11 @@ public class ClipService {
 
         }
 
-
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
 
-        //TODO 만약 clipsMapList의 크기가 0이라면? 안에 10개의 클립 요청 후, content - page - next값이 null
-        //이거 확인하여 분기
-
-        //videoId랑 클립uid를 사용하는 방법?
-
-        //클립uid로 원본 vod url 뽑아오기
-
         //List<dto>로 담기
         for (int i = 0; i < clipsMapList.size(); i++) {
-
             ClipInfoDto dto = ClipInfoDto.builder()
                     .originalUrl(((String) clipsMapList.get(i).get("clipUID")))
                     .videoId(((String) clipsMapList.get(i).get("videoId")))
@@ -397,17 +458,13 @@ public class ClipService {
                         .build();
             }
         }
-
         List<Map<String, Object>> clipsMapList =
                 (List<Map<String, Object>>) ((Map)streamerClipsMap.get("content")).get("data");
 
-        //TODO content - page - next값이 null이라면?
-
-
         //List<dto>로 담기
         for (int i = 0; i < clipsMapList.size(); i++) {
-
             ClipInfoDto dto = ClipInfoDto.builder()
+                    .clipSrcUrl(findVodUrl((String) clipsMapList.get(i).get("clipUID"), (String) clipsMapList.get(i).get("videoId")))
                     .originalUrl(((String) clipsMapList.get(i).get("clipUID")))
                     .videoId(((String) clipsMapList.get(i).get("videoId")))
                     .clipThumbnailUrl((String) clipsMapList.get(i).get("thumbnailImageUrl"))

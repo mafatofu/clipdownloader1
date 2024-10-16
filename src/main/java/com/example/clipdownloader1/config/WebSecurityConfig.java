@@ -32,6 +32,7 @@ public class WebSecurityConfig {
                                         "/multiDownload",
                                         //파일 직접다운로드
                                         "/clipDownloadDirect",
+                                        "/clipDownloadDirect/{clipUid}",
                                         //스트리머로 검색
                                         "/multiDownload/{streamerName}/{orderType}",
                                         //상위 클립 이전 / 다음페이지
