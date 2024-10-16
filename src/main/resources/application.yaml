@@ -17,3 +17,10 @@ spring:
       max-request-size: 100MB
       location: C:\chzzkClip
       enabled: true
+      #reload
+  devtools:
+    livereload:
+      enabled: true # LiveReload 브라우저 확장프로그램 설치시 적용
+    restart:
+      enabled: true
+
