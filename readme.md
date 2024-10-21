@@ -13,6 +13,6 @@
 ### 2. 스트리머 이름으로 검색
 스트리머 이름을 입력 시, 새 창에 스트리머의 클립들이 나타납니다.
 - 인기순 / 최신순 정렬
-<img src="src/main/readmeImg/clipExample2.png">
+<img src="src/main/readmeImg/clipExample2.PNG">
 
 
