@@ -45,6 +45,11 @@ public class MainController {
     ){
         return "downloader1/home";
     }
+    @GetMapping("/healthcheck")
+    public String healthcheck(){
+        return "OK";
+    }
+
     /**클립 url을 받아서 다운로드가능한 주소를 프론트로 리턴*/
     @GetMapping("/clipDownload")
     @ResponseBody
@@ -221,4 +226,6 @@ public class MainController {
         }
         return new ResponseEntity<List<String>>(resultList, HttpStatus.OK);
     }
+
+
 }
