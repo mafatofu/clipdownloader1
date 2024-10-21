@@ -26,6 +26,7 @@ public class WebSecurityConfig {
                         auth -> auth
                                 .requestMatchers(
                                         "/",
+                                        "/healthcheck",
                                         //클립동영상띄워주기
                                         "/clipDownload",
                                         //멀티 다운로드

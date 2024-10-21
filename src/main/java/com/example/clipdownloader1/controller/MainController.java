@@ -45,6 +45,7 @@ public class MainController {
     ){
         return "downloader1/home";
     }
+    //aws 체크용
     @GetMapping("/healthcheck")
     public String healthcheck(){
         return "OK";
