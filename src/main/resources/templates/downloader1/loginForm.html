@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main">
+            <main>
+                <div class="container mt-4">
+                    <!--👇여기에 내용 넣어주시면 됩니다👇-->
+                    <section class="py-5">
+                        <div class="container px-5">
+                            <!-- login form-->
+                            <div class="bg-light rounded-3 py-5 px-4 px-md-5 mb-5">
+                                <div class="row gx-5 justify-content-center">
+                                    <div class="col-lg-8 col-xl-6">
+                                        <h1 class="text-center mb-5">로그인</h1>
+                                        <form action="/login" method="post">
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="username" name="username" type="text" placeholder="Enter your username...">
+                                                <label for="username">ID</label>
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" id="password" name="password" type="password" placeholder="Enter your password...">
+                                                <label for="password">Password</label>
+                                            </div>
+                                            <div class="d-grid"><button class="btn btn-primary btn-lg" id="sign-in-button" type="submit">Submit</button></div>
+                                            <div style="margin-top: 16px; text-align: right">
+                                                <a href="/join">회원가입</a>
+                                            </div>
+                                            <div style="margin-top: 16px; text-align: right">
+                                                <a href="/home">홈으로</a>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </section>
+                    <!--👆여기에 내용 넣어주시면 됩니다👆-->
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
