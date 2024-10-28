@@ -1,9 +1,11 @@
 package com.example.clipdownloader1.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 
+import java.time.LocalDate;
 import java.util.List;
 /**멤버 정보*/
 @Entity
@@ -21,6 +23,8 @@ public class Member {
     private String password;
     private String nickName;
     private Authority authority;
+    private String imgUrl;
+    private LocalDate createdAt;
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Clip> clips;
