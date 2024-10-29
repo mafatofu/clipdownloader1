@@ -31,5 +31,10 @@ public class MemberController {
     public String join(){
         return "downloader1/join";
     }
+    /**마이페이지*/
+    @GetMapping("/myPage")
+    public String myPage(){
+        return "downloader1/myPage";
+    }
 
 }

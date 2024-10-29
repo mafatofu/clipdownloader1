@@ -62,6 +62,8 @@ public class WebSecurityConfig {
                                         "/join",
                                         //로그인
                                         "/login",
+                                        //마이페이지
+                                        "/myPage",
                                         //클립동영상띄워주기
                                         "/clipDownload",
                                         //멀티 다운로드
