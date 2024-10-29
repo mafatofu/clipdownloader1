@@ -6,6 +6,7 @@ import com.example.clipdownloader1.entity.Likes;
 import com.example.clipdownloader1.entity.Member;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 //dto
@@ -20,6 +21,7 @@ public class MemberDto {
     private String password;
     private String nickName;
     private Authority authority;
+    //private String imgUrl;
     private List<Clip> clips;
     private List<Likes> likes;
     public static MemberDto fromEntity(Member entity){
@@ -29,6 +31,7 @@ public class MemberDto {
                 .password(entity.getPassword())
                 .nickName(entity.getNickName())
                 .authority(entity.getAuthority())
+                //.imgUrl(entity.getImgUrl())
                 .clips(entity.getClips())
                 .likes(entity.getLikes())
                 .build();

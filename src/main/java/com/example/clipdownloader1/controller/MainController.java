@@ -3,6 +3,7 @@ package com.example.clipdownloader1.controller;
 import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.ClipPageDto;
+import com.example.clipdownloader1.facade.AuthenticationFacade;
 import com.example.clipdownloader1.service.ClipService;
 import com.example.clipdownloader1.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,10 +40,12 @@ public class MainController {
     private final ClipService clipService;
     private final FileService fileService;
     private final chzzkUrls chzzkUrls;
+    private final AuthenticationFacade authFacade;
     @GetMapping
     public String home(
             Model model
     ){
+        model.addAttribute("userId", authFacade.getAuth().getName());
         return "downloader1/home";
     }
 
