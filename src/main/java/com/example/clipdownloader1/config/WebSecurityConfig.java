@@ -62,8 +62,10 @@ public class WebSecurityConfig {
                                         "/join",
                                         //로그인
                                         "/login",
-                                        //마이페이지
-                                        "/myPage",
+                                        //이메일중복확인
+                                        "/duplicateCkForEmail",
+                                        //닉네임 중복확인
+                                        "/duplicateCkForNickname",
                                         //클립동영상띄워주기
                                         "/clipDownload",
                                         //멀티 다운로드
@@ -85,6 +87,10 @@ public class WebSecurityConfig {
                                         //클립 관련
                                         "/tempClips/**"
                                 ).permitAll()
+                                .requestMatchers(
+                                        //마이페이지
+                                        "/myPage"
+                                ).authenticated()
 
                 );
 
