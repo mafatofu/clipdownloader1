@@ -46,10 +46,16 @@ public class WebSecurityConfig {
                         // 인증/인가 실패시 작동하는 핸들러
                         .failureHandler(customFailureHandler)
                 )
-                .logout(logout -> logout
+                .logout(
+                        logout -> logout
                         //로그아웃 url
                         .logoutUrl("/logout")
-
+                        //로그아웃 성공 시 이동할 url
+                        .logoutSuccessUrl("/")
+                        // http 세션 무효화 여부
+                        .invalidateHttpSession(true)
+                        //해당 쿠키 삭제
+                        .deleteCookies("JSESSIONID")
                 )
                 .authorizeHttpRequests(
                         auth -> auth
@@ -89,7 +95,8 @@ public class WebSecurityConfig {
                                 ).permitAll()
                                 .requestMatchers(
                                         //마이페이지
-                                        "/myPage"
+                                        "/myPage",
+                                        "/logout"
                                 ).authenticated()
 
                 );
