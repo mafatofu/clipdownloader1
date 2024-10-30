@@ -3,6 +3,8 @@ package com.example.clipdownloader1.controller;
 import com.example.clipdownloader1.dto.MemberDto;
 import com.example.clipdownloader1.dto.ResponseMessage;
 import com.example.clipdownloader1.dto.StatusEnum;
+import com.example.clipdownloader1.dto.UpdateDto;
+import com.example.clipdownloader1.facade.AuthenticationFacade;
 import com.example.clipdownloader1.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
+    private final AuthenticationFacade authFacade;
     /**로그인 페이지*/
     @GetMapping("/login")
     public String loginForm(
@@ -57,8 +60,26 @@ public class MemberController {
 
     /**마이페이지*/
     @GetMapping("/myPage")
-    public String myPage(){
+    public String myPage(Model model){
+        MemberDto memberDto = memberService.readMember(authFacade.getAuth().getName());
+        model.addAttribute("member", memberDto);
         return "downloader1/myPage";
+    }
+
+    @PutMapping("/myPage/update")
+    @ResponseBody
+    public ResponseEntity<UpdateDto> updateMyPage(
+            @RequestBody
+            UpdateDto updateDto
+    ){
+        try {
+            memberService.updateMember(authFacade.getAuth().getName(), updateDto);
+        } catch (Exception e){
+            log.info("------------------------회원정보 수정 에러------------------------");
+            e.printStackTrace();
+        }
+        return new ResponseEntity<UpdateDto>(HttpStatus.OK);
+
     }
 
     //닉네임 중복확인

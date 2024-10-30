@@ -96,6 +96,8 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         //마이페이지
                                         "/myPage",
+                                        //회원정보수정
+                                        "/myPage/update",
                                         "/logout"
                                 ).authenticated()
 
