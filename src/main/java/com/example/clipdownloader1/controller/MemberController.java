@@ -6,6 +6,9 @@ import com.example.clipdownloader1.dto.StatusEnum;
 import com.example.clipdownloader1.dto.UpdateDto;
 import com.example.clipdownloader1.facade.AuthenticationFacade;
 import com.example.clipdownloader1.service.MemberService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +68,7 @@ public class MemberController {
         model.addAttribute("member", memberDto);
         return "downloader1/myPage";
     }
-
+    /**마이페이지 수정*/
     @PutMapping("/myPage/update")
     @ResponseBody
     public ResponseEntity<UpdateDto> updateMyPage(
@@ -79,6 +82,32 @@ public class MemberController {
             e.printStackTrace();
         }
         return new ResponseEntity<UpdateDto>(HttpStatus.OK);
+
+    }
+    /**계정 삭제*/
+    @DeleteMapping("/myPage/delete/{email}")
+    @ResponseBody
+    public ResponseEntity<Boolean> deleteMember(
+            @PathVariable("email")
+            String email,
+            HttpServletResponse response,
+            HttpSession session
+    ){
+        boolean isDeleted = false;
+        try {
+            isDeleted = memberService.deleteMember(email);
+            // + 쿠키 삭제
+            // 같은 쿠키가 이미 존재하면 덮어쓰기 된다.
+            Cookie cookie = new Cookie("JSESSIONID", "");
+            cookie.setMaxAge(0); // 0초 생존 -> 삭제
+            response.addCookie(cookie); // 요청 객체를 통해서 클라이언트에게 전달
+            session.invalidate();//세션무효화
+        } catch (Exception e){
+            log.info("------------------------회원정보 삭제 에러------------------------");
+            e.printStackTrace();
+        }
+        
+        return new ResponseEntity<Boolean>(isDeleted, HttpStatus.OK);
 
     }
 

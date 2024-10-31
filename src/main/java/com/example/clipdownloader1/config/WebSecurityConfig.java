@@ -98,6 +98,7 @@ public class WebSecurityConfig {
                                         "/myPage",
                                         //회원정보수정
                                         "/myPage/update",
+                                        "/myPage/delete/{email}",
                                         "/logout"
                                 ).authenticated()
 

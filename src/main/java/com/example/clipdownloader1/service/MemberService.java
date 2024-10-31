@@ -72,6 +72,17 @@ public class MemberService {
         memberRepo.save(member);
     }
 
+    @Transactional
+    public boolean deleteMember(String email){
+        boolean isDeleted = false;
+        Optional<Member> optionalMember = memberRepo.findByEmail(email);
+        if (optionalMember.isPresent()){
+            memberRepo.deleteByEmail(email);
+            isDeleted = true;
+        }
+        return isDeleted;
+    }
+
     //닉네임 중복확인용
     public boolean duplicateCkForNickname(String nickName) {
         //중복확인용
