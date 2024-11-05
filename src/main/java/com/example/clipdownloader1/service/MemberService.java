@@ -7,6 +7,7 @@ import com.example.clipdownloader1.dto.UpdateDto;
 import com.example.clipdownloader1.entity.Member;
 import com.example.clipdownloader1.repo.MemberRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepo memberRepo;
@@ -41,6 +43,7 @@ public class MemberService {
     public MemberDto readMember(String email){
         Optional<Member> optionalMember = memberRepo.findByEmail(email);
         if(optionalMember.isEmpty()){
+            log.info("-------------사용자 정보 확인 부분 에러. 사용자를 찾을 수 없습니다.-------------");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
         Member member = optionalMember.get();

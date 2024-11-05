@@ -30,6 +30,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class FileService {
+    private final ClipService clipService;
     String clipsLocation = "src/main/resources/tempClips";
     //
     String clipsFilePath = "static/tempClips/";
@@ -90,9 +91,8 @@ public class FileService {
         InputStream in = new URL(clipSrcUrl).openStream();
         //프로젝트로 저장 없이 바로 받아오기
         resource = new InputStreamResource(in);
-        log.info("resource test : " + resource);
-        log.info("-------------가져오기 완료!-------------");
-
+        log.info("clip title : " + clipTitle);
+        log.info("-------------클립 가져오기 완료!-------------");
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noCache())
                 .contentType(MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM))

@@ -3,29 +3,22 @@ package com.example.clipdownloader1.controller;
 import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.ClipPageDto;
+import com.example.clipdownloader1.dto.MemberDto;
+import com.example.clipdownloader1.entity.Member;
 import com.example.clipdownloader1.facade.AuthenticationFacade;
 import com.example.clipdownloader1.service.ClipService;
 import com.example.clipdownloader1.service.FileService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.jsoup.HttpStatusException;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import com.example.clipdownloader1.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.UrlResource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -39,6 +32,7 @@ import java.util.List;
 public class MainController {
     private final ClipService clipService;
     private final FileService fileService;
+    private final MemberService memberService;
     private final chzzkUrls chzzkUrls;
     private final AuthenticationFacade authFacade;
     @GetMapping
@@ -184,19 +178,28 @@ public class MainController {
     ) throws IOException {
         ResponseEntity<Resource> responseEntity;
         responseEntity = fileService.chzzkClipDirectDownloadToProject(clipSrcUrl, clipTitle);
+
+
         return responseEntity;
     }
     /**다운로드 버튼 클릭 시 PC에 클립 저장 컨트롤러
      * clipUid를 받아옴
+     * 스트리머 검색 페이지에서 사용
      * */
     @GetMapping(value="/clipDownloadDirect/{clipUid}")
     @ResponseBody
     public ResponseEntity<Resource> clipDownloadDirect(
             @PathVariable String clipUid
     ) throws Exception {
-        ClipInfoDto dto = clipService.chzzkClipInfoTakeUsingUid(clipUid);
+        ClipInfoDto clipInfoDto = clipService.chzzkClipInfoTakeUsingUid(clipUid);
+        //TODO 클립 다운로드했던 기록 저장.
+        String email = authFacade.getAuth().getName();
+        Member member = memberService.readMemberToEntity(email);
         ResponseEntity<Resource> responseEntity;
-        responseEntity = fileService.chzzkClipDirectDownloadToProject(dto.getClipSrcUrl(), dto.getClipTitle());
+        //사용자에게 다운로드창 띄워주기
+        responseEntity = fileService.chzzkClipDirectDownloadToProject(clipInfoDto.getClipSrcUrl(), clipInfoDto.getClipTitle());
+        //사용자의 클립 다운로드 기록 저장
+        clipService.createDownloadClip(member, clipInfoDto);
         return responseEntity;
     }
 

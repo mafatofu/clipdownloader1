@@ -1,5 +1,6 @@
 package com.example.clipdownloader1.dto;
 
+import com.example.clipdownloader1.entity.Clip;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClipInfoDto {
+    private Long id;
     //원본 vod url
     private String clipSrcUrl;
     private String streamer;
@@ -21,11 +23,32 @@ public class ClipInfoDto {
     private String videoId;
     private String clipTitle;
     private String clipThumbnailUrl;
+    //클립생성시간
     private LocalDateTime createdDateTime;
+    //다운로드한 시간
+    private LocalDateTime downloadedTime;
+    //다시 다운로드한 시간
+    private LocalDateTime updatedDownloadTime;
     //재생횟수
     private int readCount;
+    private Long memberId;
 
-    private String memberId;
-    //좋아요 갯수
-    private int likes;
+    public static ClipInfoDto fromEntity(Clip entity){
+        return ClipInfoDto.builder()
+                .id(entity.getId())
+                .clipSrcUrl(entity.getClipSrcUrl())
+                .streamer(entity.getStreamer())
+                .clipperName(entity.getClipperName())
+                .originalUrl(entity.getOriginalUrl())
+                .videoId(entity.getVideoId())
+                .clipTitle(entity.getClipTitle())
+                .clipThumbnailUrl(entity.getClipThumbnailUrl())
+                .createdDateTime(entity.getCreatedDateTime())
+                .downloadedTime(entity.getDownloadedTime())
+                .updatedDownloadTime(entity.getUpdatedDownloadTime())
+                .readCount(entity.getReadCount())
+                .memberId(entity.getMember().getId())
+                .build();
+
+    }
 }

@@ -4,7 +4,11 @@ import com.example.clipdownloader1.config.chzzkUrls;
 import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.ClipPageDto;
 import com.example.clipdownloader1.dto.NextPageDto;
+import com.example.clipdownloader1.entity.Clip;
+import com.example.clipdownloader1.entity.Member;
+import com.example.clipdownloader1.repo.ClipRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,6 +16,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,20 +25,71 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ClipService {
     private final MainService mainService;
     private final chzzkUrls chzzkUrls;
+    private final ClipRepo clipRepo;
     //한번에 가져올 클립들 개수
     private static int clipSize = 50;
     //스트리머 검색 후 uid를 특정지어 가져올 수 있는 html class
     private static String streamerSearchParticle = "channel_item_wrapper__CT2Qw";
+
+    /**다운로드한 클립 클립명으로 하나 가져오기*/
+    public ClipInfoDto readClipByTitle(String title){
+        Optional<Clip> optionalClip = clipRepo.findByClipTitle(title);
+
+        //다운로드한 클립정보가 없다면
+        if (optionalClip.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "클립 정보를 찾을 수 없습니다.");
+        }
+        Clip clip = optionalClip.get();
+        return ClipInfoDto.fromEntity(clip);
+    }
+    /**다운로드한 클립을 클립명과 멤버id로 하나 가져오기*/
+    public ClipInfoDto readClipByTitle(String clipTitle, Long memberId){
+        Optional<Clip> optionalClip = clipRepo.findByClipTitleAndMemberId(clipTitle, memberId);
+
+        //다운로드한 클립정보가 없다면
+        if (optionalClip.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "클립 정보를 찾을 수 없습니다.");
+        }
+        Clip clip = optionalClip.get();
+        return ClipInfoDto.fromEntity(clip);
+    }
+    /**다운로드한 클립 클립url로 하나 가져오기*/
+    public ClipInfoDto readClipByOriginalUrl(String originalUrl){
+        Optional<Clip> optionalClip = clipRepo.findByOriginalUrl(originalUrl);
+
+        //다운로드한 클립정보가 없다면
+        if (optionalClip.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "클립 정보를 찾을 수 없습니다.");
+        }
+        Clip clip = optionalClip.get();
+        return ClipInfoDto.fromEntity(clip);
+    }
+    /**다운로드했던 클립이 존재하는지 클립명으로 확인*/
+    public boolean isClipExistsByTitle(String clipTitle){
+        return clipRepo.existsByClipTitle(clipTitle);
+    }
+    /**다운로드했던 클립이 존재하는지 클립url로 확인*/
+    public boolean isClipExistsByOriginalUrl(String originalUrl){
+        return clipRepo.existsByOriginalUrl(originalUrl);
+    }
+    /**다운로드 클립 정보 저장*/
+    @Transactional
+    public void createDownloadClip(Member member, ClipInfoDto clipInfoDto){
+        Clip clip = Clip.fromDto(clipInfoDto, member);
+        clipRepo.save(clip);
+        log.info("-------------다운로드 클립 정보 저장 완료-------------");
+        log.info("사용자 : {}", member.getEmail());
+        log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
+    }
+
     public WebDriver crawlingStandard(){
         //selenium을 활용한 크롤링
         String WEB_DRIVER_ID = "webdriver.chrome.driver";
@@ -246,10 +302,10 @@ public class ClipService {
         clipInfoDto.setStreamer(streamer);
         clipInfoDto.setClipperName(clipperName);
         clipInfoDto.setOriginalUrl(clipUrl);
+        clipInfoDto.setVideoId(videoId);
         clipInfoDto.setClipTitle(clipTitle);
         clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
         clipInfoDto.setCreatedDateTime(createdDateTime);
-        
         //연결종료
         connection.disconnect();
         connection2.disconnect();
@@ -311,16 +367,18 @@ public class ClipService {
         //클리퍼 닉네임
         String clipperName = (String) ((Map)((Map)(((Map)
                 takeVideoMap.get("card")).get("interaction"))).get("subscription")).get("name");
-        //srcUrl 클립제목 썸네일 스트리머이름 클립 딴사람이름 싹다 묶어서 dto로
+        //재생횟수
+        int readCount = (int) ((Map)((Map)((Map)(Map) takeVideoMap.get("card")).get("content")).get("vod")).get("count");
 
         clipInfoDto.setClipSrcUrl(clipSrcUrl);
         clipInfoDto.setStreamer(streamer);
         clipInfoDto.setClipperName(clipperName);
         clipInfoDto.setOriginalUrl(chzzkUrls.clipUrl(clipUid));
+        clipInfoDto.setVideoId(videoId);
         clipInfoDto.setClipTitle(clipTitle);
         clipInfoDto.setClipThumbnailUrl(thumbnailImageUrl);
         clipInfoDto.setCreatedDateTime(createdDateTime);
-
+        clipInfoDto.setReadCount(readCount);
         //연결종료
         connection.disconnect();
         connection2.disconnect();
