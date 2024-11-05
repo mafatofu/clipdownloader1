@@ -1,10 +1,8 @@
 package com.example.clipdownloader1.dto;
 
-import com.example.clipdownloader1.entity.Likes;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**프론트단에서 클립 직접 다운로드 시 url 정보를 가져오는 DTO*/
 @Builder

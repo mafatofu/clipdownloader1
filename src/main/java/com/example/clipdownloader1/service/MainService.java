@@ -1,7 +1,6 @@
 package com.example.clipdownloader1.service;
 
 
-import com.example.clipdownloader1.repo.ClipRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MainService {
-    private final ClipRepo clipRepo;
+
     /**json형태로 받아 map으로 반환*/
     public Map<String, Object> jsonToMap(String json) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();

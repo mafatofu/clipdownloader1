@@ -26,18 +26,24 @@ public class Clip {
     private String originalUrl;
     //치지직 videoId
     private String videoId;
+    //클립명
     private String clipTitle;
+    //클립 썸네일 url
     private String clipThumbnailUrl;
-    private LocalDateTime downloadTime;
+    //생성일
     private LocalDateTime createdDateTime;
+    //다운로드한 시간
+    private LocalDateTime downloadedTime;
     //재생횟수
     private int readCount;
 
+    //사용자 정보
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @OneToMany(mappedBy = "clip", fetch = FetchType.LAZY)
-    private List<Likes> likes;
-
+    @PrePersist
+    public void onCreate(){
+        this.downloadedTime = LocalDateTime.now();
+    }
 }
