@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="kr" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+</head>
+<body>
+<!--다운로드한 클립 기록-->
+<!--<div id="downloadLog">-->
+<!--    <table th:unless="${clipInfoDtoList.isEmpty()}" class="clipTable">-->
+<!--        <thead>-->
+<!--        <tr id="clipTableHead">-->
+<!--            <th class="clipInfoItem" scope="col">썸네일</th>-->
+<!--            <th class="clipInfoItem" scope="col">클립 제목</th>-->
+<!--            <th class="clipInfoItem" scope="col">재생 횟수</th>-->
+<!--            <th class="clipInfoItem" scope="col">클립 선택</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody id="clipTableBody">-->
+<!--        <tr>-->
+<!--        </tr>-->
+<!--        <tr class="clipInfo" th:each="clipInfoDto: ${clipInfoDtoList}">-->
+<!--            <th scope="col" class="clipsThumbnail clipInfoItem">-->
+<!--                <img class="clipsThumbnailImg" th:src="${clipInfoDto.getClipThumbnailUrl()}">-->
+<!--            </th>-->
+<!--            <th scope="col" id="clipInfoTitle" class="clipInfoItem">-->
+<!--                <a class="clipOriginalUrl" th:href="${clipUrlSrc} + ${clipInfoDto.getOriginalUrl()}" th:text="${clipInfoDto.getClipTitle()}" target='_blank'></a>-->
+<!--            </th>-->
+<!--            <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getReadCount()}"></th>-->
+<!--            <th scope="col" id="checkClipInput" class="clipInfoItem">-->
+<!--                <a class="clipDownloadDirectAnchor" th:href="@{/clipDownloadDirect/{clipUid}(clipUid=${clipInfoDto.getOriginalUrl()})}">다운로드</a>-->
+<!--            </th>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--</div>-->
+<!-- 마이프로필 및 로그아웃 버튼 (인증된 사용자만 보임) -->
+<div sec:authorize="isAuthenticated()" class="centered-container-new">
+    <p>
+    <h6>반갑습니다, <strong><span th:text="${userId}"></span></strong>님!</h6>
+    </p>
+    <p>
+    <form action="/logout" method="post" style="display: inline;">
+        <a href="/myPage" class="btn btn-info btn-spacing" style="margin-right: 10px;">마이프로필</a>
+        <input type="submit" value="로그아웃" class="btn btn-danger">
+    </form>
+    </p>
+</div>
+<script th:inline="javascript">
+
+</script>
+</body>
+</html>

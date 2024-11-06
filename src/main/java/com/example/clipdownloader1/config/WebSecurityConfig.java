@@ -98,8 +98,11 @@ public class WebSecurityConfig {
                                         "/myPage",
                                         //회원정보수정
                                         "/myPage/update",
+                                        //회원정보삭제
                                         "/myPage/delete/{email}",
-                                        "/logout"
+                                        "/logout",
+                                        //다운로드기록페이지
+                                        "/downloadLog"
                                 ).authenticated()
 
                 );

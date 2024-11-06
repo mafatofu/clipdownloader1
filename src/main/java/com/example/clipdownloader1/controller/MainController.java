@@ -235,5 +235,15 @@ public class MainController {
         return new ResponseEntity<List<String>>(resultList, HttpStatus.OK);
     }
 
+    /**download log 컨트롤러*/
+    @GetMapping("/downloadLog")
+    public String downloadLogController(
+            Model model
+    ){
+        String email = authFacade.getAuth().getName();
+        //페이징을 통해 한번에 10개씩 가져오기
+        return "downloader1/downloadLog";
+    }
+
 
 }
