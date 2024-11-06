@@ -16,7 +16,7 @@ public class ClipDto {
     private String clipName;
     private String originalUrl;
     private String extractUrl;
-    private LocalDateTime downloadedTime;
+    private LocalDateTime createdDateTime;
 
     public static ClipDto fromEntity(Clip entity){
         return ClipDto.builder()
@@ -25,7 +25,7 @@ public class ClipDto {
                 .clipName(entity.getClipTitle())
                 .originalUrl(entity.getOriginalUrl())
                 .extractUrl(entity.getClipSrcUrl())
-                .downloadedTime(entity.getDownloadedTime())
+                .createdDateTime(entity.getCreatedDateTime())
                 .build();
     }
 }
