@@ -83,11 +83,21 @@ public class ClipService {
     /**다운로드 클립 정보 저장*/
     @Transactional
     public void createDownloadClip(Member member, ClipInfoDto clipInfoDto){
-        Clip clip = Clip.fromDto(clipInfoDto, member);
-        clipRepo.save(clip);
-        log.info("-------------다운로드 클립 정보 저장 완료-------------");
-        log.info("사용자 : {}", member.getEmail());
-        log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
+        //이미 같은 데이터가 존재한다면, 날짜 update
+        Optional<Clip> optionalClip = clipRepo.findByClipTitleAndMemberId(clipInfoDto.getClipTitle(), member.getId());
+        if (optionalClip.isPresent()){
+            Clip clip = optionalClip.get();
+            log.info("-------------다운로드 클립 정보 저장 완료(재다운로드)-------------");
+            log.info("사용자 : {}", member.getEmail());
+            log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
+            clip.onUpdate();
+        } else {
+            Clip clip = Clip.fromDto(clipInfoDto, member);
+            clipRepo.save(clip);
+            log.info("-------------다운로드 클립 정보 저장 완료-------------");
+            log.info("사용자 : {}", member.getEmail());
+            log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
+        }
     }
 
     public WebDriver crawlingStandard(){

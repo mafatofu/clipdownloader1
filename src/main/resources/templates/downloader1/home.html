@@ -89,6 +89,7 @@
                     <span id="streamer"></span><br>
                     <span id="clipperName"></span><br>
                     <span id="clipTitle"></span><br>
+                    <span id="clipUrl"></span><br>
                     <span id="clipCreatedTime"></span><br>
                 </div>
                 <div id="clipDownloadDirect">
@@ -197,6 +198,7 @@
                         let clipperName = $('#clipperName');
                         let clipTitle = $('#clipTitle');
                         let clipCreatedTime = $('#clipCreatedTime');
+                        let clipUrl = $('#clipUrl');
 
                         streamer.text("스트리머 : " + result.streamer);
                         clipperName.text("클립퍼 : " + result.clipperName);
@@ -210,11 +212,13 @@
                             +":"+result.createdDateTime[4]
                             +":"+result.createdDateTime[5]
                         );
-                        //뿌려준 값들 중, 제목은 '다운로드' 버튼 클릭 시 clipSrcUrl과 함께 back단으로 넘기기
+                        clipUrl.text("원본 url : " + result.originalUrl);
 
+                        //원본 클립 url에서 uid부분만 잘라내기
+                        const clipUid = result.originalUrl.split("/");
                         //다운로드 앵커 링크 만들어주기
                         document.getElementById("clipDownloadDirectAnchor").href =
-                            "clipDownloadDirect"+"?clipSrcUrl="+result.clipSrcUrl+"&clipTitle="+result.clipTitle;
+                            "clipDownloadDirect"+"?clipSrcUrl="+result.clipSrcUrl+"&clipTitle="+result.clipTitle+"&clipUid="+clipUid[4];
                     },
                     error:function (error){
                         alert("에러가 발생했습니다. 클립주소를 확인해주세요!" + error);

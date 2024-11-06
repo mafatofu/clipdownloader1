@@ -169,17 +169,23 @@ public class MainController {
 
     /**
      * 다운로드 버튼 클릭 시 PC에 바로 저장 컨트롤러
+     * 클립 url 검색 후 한 개의 영상에 나오는 다운로드 버튼 클릭 시 동작
      */
     @GetMapping(value="/clipDownloadDirect", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     public ResponseEntity<Resource> clipDownloadDirect(
             @RequestParam String clipSrcUrl,
-            @RequestParam String clipTitle
-    ) throws IOException {
+            @RequestParam String clipTitle,
+            @RequestParam String clipUid
+    ) throws Exception {
+        //TODO 클립 다운로드했던 기록 저장.
+        ClipInfoDto clipInfoDto = clipService.chzzkClipInfoTakeUsingUid(clipUid);
+        String email = authFacade.getAuth().getName();
+        Member member = memberService.readMemberToEntity(email);
         ResponseEntity<Resource> responseEntity;
         responseEntity = fileService.chzzkClipDirectDownloadToProject(clipSrcUrl, clipTitle);
-
-
+        //사용자의 클립 다운로드 기록 저장
+        clipService.createDownloadClip(member, clipInfoDto);
         return responseEntity;
     }
     /**다운로드 버튼 클릭 시 PC에 클립 저장 컨트롤러
