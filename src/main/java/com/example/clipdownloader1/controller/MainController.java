@@ -81,6 +81,7 @@ public class MainController {
             System.out.println("--------------스트리머 검색 에러--------------");
             e.printStackTrace();
         }
+
         //결과를 view단으로 넘기기
         model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
         model.addAttribute("streamerName", streamerName);
@@ -150,18 +151,21 @@ public class MainController {
         }
         //결과를 view단으로 넘기기
         //상위 클립 10개 정보
-        model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
+        //스트리머 검색 시 데이터를 끌고 왔다면
+        if (!(clipPageDto.getClipInfoDtoList() == null)){
+            model.addAttribute("clipInfoDtoList",clipPageDto.getClipInfoDtoList());
+            //다음 페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
+            model.addAttribute("nextClipUid", clipPageDto.getNextPageDto().getClipUid());
+            model.addAttribute("nextReadCount", clipPageDto.getNextPageDto().getReadCount());
+        }
         //스트리머명
         model.addAttribute("streamerName", streamerName);
-        //정렬기준
-        model.addAttribute("orderType", orderType);
-        //다음 페이지 이동을 위한 맨 마지막 클립의 uid와 readCount
-        model.addAttribute("nextClipUid", clipPageDto.getNextPageDto().getClipUid());
-        model.addAttribute("nextReadCount", clipPageDto.getNextPageDto().getReadCount());
-        //페이지카운트
-        model.addAttribute("pageCount", pageCount);
         //클립 url src
         model.addAttribute("clipUrlSrc", chzzkUrls.clipUrlSrc());
+        //페이지카운트
+        model.addAttribute("pageCount", pageCount);
+        //정렬기준
+        model.addAttribute("orderType", orderType);
         return "downloader1/multiDownload";
 
     }

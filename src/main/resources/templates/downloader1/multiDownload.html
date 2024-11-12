@@ -83,11 +83,11 @@
             flex-basis: 15%;
             margin-bottom: 3%;
         }
-        #clipsControl{
+        .clipsControl{
             display: flex;
             justify-content: space-between;
         }
-        #clipsOrderControl{
+        .clipsOrderControl{
             display: flex;
             justify-content: space-around;
             height: 70%;
@@ -134,7 +134,7 @@
     <div id="mainLeft"></div>
     <div id="mainCenter">
         <div id="chzzkClipUrlInput">
-            <form action="/clipDownload" method="get">
+            <form action="#" method="get">
                 <select id="searchType" name="searchType" >
                     <option value="1" name="clipUrlSelect">클립URL</option>
                     <option value="2" name="streamerSelect">스트리머</option>
@@ -170,17 +170,22 @@
             </div>
         </div>
         <div id="clips">
-            <div id="clipsControl">
-                <div id="clipsOrderControl">
-                    <button type="button" id="popularOrderBtn" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
-                    <button type="button" id="recentOrderBtn" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
+            <div th:if="${clipInfoDtoList == null}" class="clipsControl">
+                <div class="clipsOrderControl">
+                    <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR">인기순</button>
+                    <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT">최신순</button>
                 </div>
-<!--                <input id="selectAll" type="checkbox" name="checkClip" onclick="selectAll(this)">-->
             </div>
-            <table th:if="${clipInfoDtoList.isEmpty()}" class="clipTable">
-                비어있습니다.
+            <div th:unless="${clipInfoDtoList == null}" class="clipsControl">
+                <div class="clipsOrderControl">
+                    <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
+                    <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
+                </div>
+            </div>
+            <table th:if="${clipInfoDtoList == null}" class="clipTable">
+                검색 결과가 없습니다.
             </table>
-            <table th:unless="${clipInfoDtoList.isEmpty()}" class="clipTable">
+            <table th:unless="${clipInfoDtoList == null}" class="clipTable">
                 <thead>
                     <tr id="clipTableHead">
                         <th class="clipInfoItem" scope="col">썸네일</th>
@@ -213,8 +218,16 @@
                 </tbody>
             </table>
         </div>
-        <div th:if="${clipInfoDtoList.isEmpty()}"></div>
-        <div th:unless="${clipInfoDtoList.isEmpty()}" id="mainFooter">
+        <div th:if="${clipInfoDtoList == null}">
+            <ui class="paging">
+                <li class="pageItem">
+                    <form class="pageForm" method="get">
+                        <button class="nextPage" type="button">다음 페이지</button>
+                    </form>
+                </li>
+            </ui>
+        </div>
+        <div th:unless="${clipInfoDtoList == null}" id="mainFooter">
             <div></div>
             <div id="paging" class="d-flex justify-content-center mt-3">
                 <ui class="paging">
@@ -223,7 +236,7 @@
                             <input type="hidden" name="nextClipUid" th:value="${nextClipUid}">
                             <input type="hidden" name="nextReadCount" th:value="${nextReadCount}">
                             <input type="hidden" name="pageCk" value="next">
-                            <button id="nextPage" type="submit" onclick="pageChange(this)">다음 페이지</button>
+                            <button class="nextPage" type="submit" onclick="pageChange(this)">다음 페이지</button>
                         </form>
                     </li>
                 </ui>
@@ -277,8 +290,8 @@
     let pageCount = [[${pageCount}]];
     const  nextClipUid = [[${nextClipUid}]];
 
-    const preventPage = document.querySelector("#preventPage");
-    const nextPage = document.querySelector("#nextPage");
+    //const preventPage = document.querySelector("#preventPage");
+    const nextPage = document.querySelector(".nextPage");
 
     //이전페이지
     //현재 첫페이지인데 이전버튼클릭 시
@@ -470,7 +483,8 @@
                 //검색페이지로 이동
                 // 기본 인기순. 이후 결과페이지에서는 버튼 클릭 등에 따라 인기순 / 최신순으로 분기
                 // 첫페이지를 향한다.
-                location.href = "/multiDownload/"+searchText+"/"+"POPULAR" +"/"+1;
+                window.location.href = "/multiDownload/"+searchText+"/"+"POPULAR" +"/"+1;
+
             }
         }
     });

@@ -419,10 +419,21 @@ public class ClipService {
         //2. 스트리머 uid로 검색한 결과를 10개씩 페이징하여 가져옴
 
         List<ClipInfoDto> clipInfoDtoList = new ArrayList<ClipInfoDto>();
+
+        //검색된 데이터가 존재하는지 확인
+        List<Object> dataList = new ArrayList<>();
+        dataList = (ArrayList)((((Map)streamerInfoMap.get("content")).get("data")));
+
+        //데이터가 존재하지 않는다면(스트리머명으로 검색 시 받아온 데이터가 존재하지 않는다면)
+        //빈 데이터 return
+        if (dataList.isEmpty()){
+            return clipPageDto;
+        }
         //스트리머 데이터
         Map<String, Object> extractMap
                 = (Map<String, Object>) ((Map)((List)((Map)streamerInfoMap.get("content")).get("data")).get(0)).get("channel");
         String streamerUid = (String) extractMap.get("channelId");
+
         //2. 가져온 스트리머 uid로 클립 여러개 가져오기
         //10개를 기준으로 가져오기
         //TODO 만약 clipUid와 readCount가 있다면 분기
