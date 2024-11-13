@@ -5,8 +5,10 @@ import com.example.clipdownloader1.dto.ClipInfoDto;
 import com.example.clipdownloader1.dto.ClipPageDto;
 import com.example.clipdownloader1.dto.NextPageDto;
 import com.example.clipdownloader1.entity.Clip;
+import com.example.clipdownloader1.entity.DownloadClipLog;
 import com.example.clipdownloader1.entity.Member;
 import com.example.clipdownloader1.repo.ClipRepo;
+import com.example.clipdownloader1.repo.DownloadClipLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -34,12 +36,11 @@ public class ClipService {
     private final MainService mainService;
     private final chzzkUrls chzzkUrls;
     private final ClipRepo clipRepo;
+    private final DownloadClipLogRepo downloadClipLogRepo;
     //한번에 가져올 클립들 개수
     private static int clipSize = 50;
-    //스트리머 검색 후 uid를 특정지어 가져올 수 있는 html class
-    private static String streamerSearchParticle = "channel_item_wrapper__CT2Qw";
 
-    /**다운로드한 클립 클립명으로 하나 가져오기*/
+    /**클립명으로 클립 하나 가져오기*/
     public ClipInfoDto readClipByTitle(String title){
         Optional<Clip> optionalClip = clipRepo.findByClipTitle(title);
 
@@ -50,18 +51,8 @@ public class ClipService {
         Clip clip = optionalClip.get();
         return ClipInfoDto.fromEntity(clip);
     }
-    /**다운로드한 클립을 클립명과 멤버id로 하나 가져오기*/
-    public ClipInfoDto readClipByTitle(String clipTitle, Long memberId){
-        Optional<Clip> optionalClip = clipRepo.findByClipTitleAndMemberId(clipTitle, memberId);
 
-        //다운로드한 클립정보가 없다면
-        if (optionalClip.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "클립 정보를 찾을 수 없습니다.");
-        }
-        Clip clip = optionalClip.get();
-        return ClipInfoDto.fromEntity(clip);
-    }
-    /**다운로드한 클립 클립url로 하나 가져오기*/
+    /**클립url로 클립 하나 가져오기*/
     public ClipInfoDto readClipByOriginalUrl(String originalUrl){
         Optional<Clip> optionalClip = clipRepo.findByOriginalUrl(originalUrl);
 
@@ -72,32 +63,42 @@ public class ClipService {
         Clip clip = optionalClip.get();
         return ClipInfoDto.fromEntity(clip);
     }
-    /**다운로드했던 클립이 존재하는지 클립명으로 확인*/
+    /**클립이 존재하는지 클립명으로 확인*/
     public boolean isClipExistsByTitle(String clipTitle){
         return clipRepo.existsByClipTitle(clipTitle);
     }
-    /**다운로드했던 클립이 존재하는지 클립url로 확인*/
+    /**클립이 존재하는지 클립url로 확인*/
     public boolean isClipExistsByOriginalUrl(String originalUrl){
         return clipRepo.existsByOriginalUrl(originalUrl);
     }
-    /**다운로드 클립 정보 저장*/
+    /**클립 정보 저장 + 클립 다운로드 로그 저장(멤버정보 + 클립정보)*/
     @Transactional
     public void createDownloadClip(Member member, ClipInfoDto clipInfoDto){
-        //이미 같은 데이터가 존재한다면, 날짜 update
-        Optional<Clip> optionalClip = clipRepo.findByClipTitleAndMemberId(clipInfoDto.getClipTitle(), member.getId());
+        //클립 정보 저장
+        //이미 같은 클립을 누군가 다운로드 했었다면, 클립 정보는 새로 저장할 필요 없다.
+        Optional<Clip> optionalClip = clipRepo.findByClipTitle(clipInfoDto.getClipTitle());
+        Clip clip;
         if (optionalClip.isPresent()){
-            Clip clip = optionalClip.get();
-            log.info("-------------다운로드 클립 정보 저장 완료(재다운로드)-------------");
-            log.info("사용자 : {}", member.getEmail());
-            log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
-            clip.onUpdate();
+            clip = optionalClip.get();
         } else {
-            Clip clip = Clip.fromDto(clipInfoDto, member);
+            //클립 정보 새로 저장
+            clip = Clip.fromDto(clipInfoDto);
             clipRepo.save(clip);
-            log.info("-------------다운로드 클립 정보 저장 완료-------------");
-            log.info("사용자 : {}", member.getEmail());
-            log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
         }
+        //클립 다운로드 기록 저장
+        Optional<DownloadClipLog> optionalDownloadClipLog = downloadClipLogRepo.findByClipAndMember(clip, member);
+        DownloadClipLog downloadClipLog;
+        //같은 멤버의 재다운로드 시, 재다운로드시간만 업데이트해주기
+        if (optionalDownloadClipLog.isPresent()){
+            downloadClipLog = optionalDownloadClipLog.get();
+            downloadClipLog.onUpdate();
+        } else { //신규 다운로드 시 새로운 다운로드 데이터 저장
+            downloadClipLog = DownloadClipLog.fromOthers(member, clip);
+            downloadClipLogRepo.save(downloadClipLog);
+        }
+        log.info("-------------다운로드 클립 정보 저장 완료-------------");
+        log.info("사용자 : {}", member.getEmail());
+        log.info("다운로드 클립명 : {}", clipInfoDto.getClipTitle());
     }
 
     public WebDriver crawlingStandard(){

@@ -37,27 +37,10 @@ public class Clip {
     private String clipThumbnailUrl;
     //클립생성 시간
     private LocalDateTime createdDateTime;
-    //다운로드한 시간
-    private LocalDateTime downloadedTime;
-    //다시 다운로드한 시간
-    private LocalDateTime updatedDownloadTime;
     //재생횟수
     private int readCount;
 
-    //사용자 정보
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member member;
-
-    @PrePersist
-    public void onCreate(){
-        this.downloadedTime = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {this.updatedDownloadTime = LocalDateTime.now(); }
-
-    public static Clip fromDto(ClipInfoDto dto, Member member){
+    public static Clip fromDto(ClipInfoDto dto){
         return Clip.builder()
                 .id(dto.getId())
                 .clipSrcUrl(dto.getClipSrcUrl())
@@ -68,10 +51,7 @@ public class Clip {
                 .clipTitle(dto.getClipTitle())
                 .clipThumbnailUrl(dto.getClipThumbnailUrl())
                 .createdDateTime(dto.getCreatedDateTime())
-                .downloadedTime(dto.getDownloadedTime())
-                .updatedDownloadTime(dto.getUpdatedDownloadTime())
                 .readCount(dto.getReadCount())
-                .member(member)
                 .build();
     }
 }

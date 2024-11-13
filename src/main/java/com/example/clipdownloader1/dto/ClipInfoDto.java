@@ -44,10 +44,7 @@ public class ClipInfoDto {
                 .clipTitle(entity.getClipTitle())
                 .clipThumbnailUrl(entity.getClipThumbnailUrl())
                 .createdDateTime(entity.getCreatedDateTime())
-                .downloadedTime(entity.getDownloadedTime())
-                .updatedDownloadTime(entity.getUpdatedDownloadTime())
                 .readCount(entity.getReadCount())
-                .memberId(entity.getMember().getId())
                 .build();
 
     }

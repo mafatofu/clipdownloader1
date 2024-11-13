@@ -2,6 +2,7 @@ package com.example.clipdownloader1.dto;
 
 import com.example.clipdownloader1.entity.Authority;
 import com.example.clipdownloader1.entity.Clip;
+import com.example.clipdownloader1.entity.DownloadClipLog;
 import com.example.clipdownloader1.entity.Member;
 import lombok.*;
 
@@ -20,7 +21,7 @@ public class MemberDto {
     private String nickName;
     private Authority authority;
     //private String imgUrl;
-    private List<Clip> clips;
+    private List<DownloadClipLog> downloadClipLogList;
 
     public static MemberDto fromEntity(Member entity){
         return MemberDto.builder()
@@ -30,7 +31,7 @@ public class MemberDto {
                 .nickName(entity.getNickName())
                 .authority(entity.getAuthority())
                 //.imgUrl(entity.getImgUrl())
-                .clips(entity.getClips())
+                .downloadClipLogList(entity.getDownloadClipLogList())
                 .build();
     }
 }
