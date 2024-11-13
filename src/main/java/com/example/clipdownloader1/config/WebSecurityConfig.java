@@ -60,8 +60,6 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(
-                                        //기본 url
-                                        "/",
                                         //aws 상태 체크
                                         "/healthcheck",
                                         //회원가입페이지
@@ -72,6 +70,17 @@ public class WebSecurityConfig {
                                         "/duplicateCkForEmail",
                                         //닉네임 중복확인
                                         "/duplicateCkForNickname",
+                                        //템플릿 관련
+                                        "/css/**",
+                                        "/js/**",
+                                        "/fonts/**",
+                                        "/img/**",
+                                        //클립 관련
+                                        "/tempClips/**"
+                                ).permitAll()
+                                .requestMatchers(
+                                        //기본 url
+                                        "/",
                                         //클립동영상띄워주기
                                         "/clipDownload",
                                         //멀티 다운로드
@@ -85,15 +94,6 @@ public class WebSecurityConfig {
                                         "/multiDownload/{streamerName}/{orderType}/{pageCount}",
                                         //여러 개의 파일을 한번에 다운로드
                                         "/multiDownload/clipDownloadDirectMulti",
-                                        //템플릿 관련
-                                        "/css/**",
-                                        "/js/**",
-                                        "/fonts/**",
-                                        "/img/**",
-                                        //클립 관련
-                                        "/tempClips/**"
-                                ).permitAll()
-                                .requestMatchers(
                                         //마이페이지
                                         "/myPage",
                                         //회원정보수정
