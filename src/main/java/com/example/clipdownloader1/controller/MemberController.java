@@ -66,6 +66,7 @@ public class MemberController {
     public String myPage(Model model){
         MemberDto memberDto = memberService.readMember(authFacade.getAuth().getName());
         model.addAttribute("member", memberDto);
+        model.addAttribute("userId", authFacade.getAuth().getName());
         return "downloader1/myPage";
     }
     /**마이페이지 수정*/

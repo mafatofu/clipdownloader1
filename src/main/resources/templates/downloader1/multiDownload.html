@@ -3,7 +3,7 @@
 <head>
     <th:block th:replace="~{common/header :: headerFragment}"></th:block>
     <style>
-        body{
+        #main{
             display: flex;
             justify-content: space-between;
         }
@@ -130,133 +130,22 @@
         #clipDownloadDirectAnchor{
             visibility: hidden;
         }
-
+        #navi{
+            display: flex;
+            justify-content: space-around;
+        }
+        .centered-container-new{
+            color: aliceblue;
+        }
 </style>
 </head>
 <body>
-    <div id="mainLeft"></div>
-    <div id="mainCenter">
-        <div id="chzzkClipUrlInput">
-            <form action="#" method="get">
-                <select id="searchType" name="searchType" >
-                    <option value="1" name="clipUrlSelect">클립URL</option>
-                    <option value="2" name="streamerSelect">스트리머</option>
-                </select>
-                <input type="text" placeholder="검색어를 입력해주세요"
-                       id="searchText" name="searchText"
-                       required>
-                <button class="btn btn-primary" id="searchBtn" type="submit">입력</button>
-            </form>
-            <div id="videoNone">
-                <div id="notice">
-                    <p>치지직 클립 다운로더 페이지입니다.</p>
-                    <p>1. 클립 주소 / 스트리머 이름으로 검색 가능합니다.</p>
-                    <p>2. 스트리머 이름 입력 시 새 창에 영상들이 나타납니다.</p>
-                    <p>3. 클립은 C드라이브 내 "chzzkClip" 폴더 내로 저장됩니다(다운로드시 폴더 자동 생성)</p>
-                </div>
-            </div>
-            <div id="clipInfo">
-                <div id="infos">
-                    <span id="streamer"></span><br>
-                    <span id="clipperName"></span><br>
-                    <span id="clipTitle"></span><br>
-                    <span id="clipCreatedTime"></span><br>
-                </div>
-                <div id="clipDownloadDirect">
-                    <a id="clipDownloadDirectAnchor" href="">다운로드</a>
-                </div>
-            </div>
-            <div id="videoOn">
-                <video id="clipVideo" controls="">
-                    <source id="videoSource" type="video/mp4">
-                </video>
-            </div>
-        </div>
-        <div id="clips">
-            <div th:if="${clipInfoDtoList == null}" class="clipsControl">
-                <div class="clipsOrderControl">
-                    <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR">인기순</button>
-                    <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT">최신순</button>
-                </div>
-            </div>
-            <div th:unless="${clipInfoDtoList == null}" class="clipsControl">
-                <div class="clipsOrderControl">
-                    <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
-                    <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
-                </div>
-            </div>
-            <table th:if="${clipInfoDtoList == null}" class="clipTable">
-                검색 결과가 없습니다.
-            </table>
-            <table th:unless="${clipInfoDtoList == null}" class="clipTable">
-                <thead>
-                    <tr id="clipTableHead">
-                        <th class="clipInfoItem" scope="col">썸네일</th>
-                        <th class="clipInfoItem" scope="col">클립 제목</th>
-                        <th class="clipInfoItem" scope="col">재생 횟수</th>
-                        <th class="clipInfoItem" scope="col">클립 선택</th>
-
-                    </tr>
-                </thead>
-                <tbody id="clipTableBody">
-                    <tr>
-
-                    </tr>
-                    <tr class="clipInfo" th:each="clipInfoDto: ${clipInfoDtoList}">
-                        <th scope="col" class="clipsThumbnail clipInfoItem">
-                            <img class="clipsThumbnailImg" th:src="${clipInfoDto.getClipThumbnailUrl()}">
-                        </th>
-<!--                        <th scope="col" id="clipInfoTitle" class="clipInfoItem" th:text="${clipInfoDto.getClipTitle()}"></th>-->
-                        <th scope="col" id="clipInfoTitle" class="clipInfoItem">
-                            <a class="clipOriginalUrl" th:href="${clipUrlSrc} + ${clipInfoDto.getOriginalUrl()}" th:text="${clipInfoDto.getClipTitle()}" target='_blank'></a>
-                        </th>
-                        <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getReadCount()}"></th>
-                        <th scope="col" id="checkClipInput" class="clipInfoItem">
-                            <a class="clipDownloadDirectAnchor" th:href="@{/clipDownloadDirect/{clipUid}(clipUid=${clipInfoDto.getOriginalUrl()})}">다운로드</a>
-<!--                            <input type="hidden" th:value="${clipInfoDto.getVideoId()}">-->
-<!--                            <input class="checkClip" type="checkbox" th:name="checkClip" th:value="${clipInfoDto.getOriginalUrl()}">-->
-<!--                            <input type="hidden" th:value="${clipInfoDto.getClipTitle()}">-->
-                        </th>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div th:if="${clipInfoDtoList == null}">
-            <ui class="paging">
-                <li class="pageItem">
-                    <form class="pageForm" method="get">
-                        <button class="nextPage" type="button">다음 페이지</button>
-                    </form>
-                </li>
-            </ui>
-        </div>
-        <div th:unless="${clipInfoDtoList == null}" id="mainFooter">
-            <div></div>
-            <div id="paging" class="d-flex justify-content-center mt-3">
-                <ui class="paging">
-                    <li th:if="${nextClipUid} ne null" class="pageItem">
-                        <form class="pageForm" th:action="@{/multiDownload/{streamerName}/{orderType}/{pageCount}(streamerName=${streamerName}, orderType=${orderType}, pageCount=${pageCount + 1})}" method="get">
-                            <input type="hidden" name="nextClipUid" th:value="${nextClipUid}">
-                            <input type="hidden" name="nextReadCount" th:value="${nextReadCount}">
-                            <input type="hidden" name="pageCk" value="next">
-                            <button class="nextPage" type="submit" onclick="pageChange(this)">다음 페이지</button>
-                        </form>
-                    </li>
-                </ui>
-            </div>
-            <div>
-<!--                <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>-->
-            </div>
-        </div>
-        <!-- 로딩 화면 -->
-        <div class="mask">
-            <img class="loadingImg" src=''>
-            <p class="loadingText">다운로드중입니다....기다료봥~</p>
-        </div>
-        <!-- 로딩화면 끝 -->
-    </div>
-    <div id="mainRight">
-        <div>
+    <div id="navi">
+        <a href="/">
+            <img src="/img/home.png" width="50%" alt="chzzk Clip Downloader">
+        </a>
+        <div></div>
+        <div id="loginBar">
             <div sec:authorize="isAnonymous()" class="centered-container-new">
                 <p>
                 <h6><strong>회원가입</strong> 및 <strong>로그인</strong>을 하면 메뉴를 이용하실 수 있습니다. 함께 달려요!</h6>
@@ -266,7 +155,6 @@
                     <a href="/join" class="btn btn-warning btn-spacing">회원가입</a>
                 </p>
             </div>
-
             <!-- 마이프로필 및 로그아웃 버튼 (인증된 사용자만 보임) -->
             <div sec:authorize="isAuthenticated()" class="centered-container-new">
                 <p>
@@ -279,6 +167,131 @@
                 </form>
                 </p>
             </div>
+        </div>
+    </div>
+    <div id="main">
+        <div id="mainLeft"></div>
+        <div id="mainCenter">
+            <div id="chzzkClipUrlInput">
+                <form action="#" method="get">
+                    <select id="searchType" name="searchType" >
+                        <option value="1" name="clipUrlSelect">클립URL</option>
+                        <option value="2" name="streamerSelect">스트리머</option>
+                    </select>
+                    <input type="text" placeholder="검색어를 입력해주세요"
+                           id="searchText" name="searchText"
+                           required>
+                    <button class="btn btn-primary" id="searchBtn" type="submit">입력</button>
+                </form>
+                <div id="videoNone">
+                    <div id="notice">
+                        <p>치지직 클립 다운로더 페이지입니다.</p>
+                        <p>1. 클립 주소 / 스트리머 이름으로 검색 가능합니다.</p>
+                        <p>2. 스트리머 이름 입력 시 새 창에 영상들이 나타납니다.</p>
+                        <p>3. 클립은 C드라이브 내 "chzzkClip" 폴더 내로 저장됩니다(다운로드시 폴더 자동 생성)</p>
+                    </div>
+                </div>
+                <div id="clipInfo">
+                    <div id="infos">
+                        <span id="streamer"></span><br>
+                        <span id="clipperName"></span><br>
+                        <span id="clipTitle"></span><br>
+                        <span id="clipCreatedTime"></span><br>
+                    </div>
+                    <div id="clipDownloadDirect">
+                        <a id="clipDownloadDirectAnchor" href="">다운로드</a>
+                    </div>
+                </div>
+                <div id="videoOn">
+                    <video id="clipVideo" controls="">
+                        <source id="videoSource" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+            <div id="clips">
+                <div th:if="${clipInfoDtoList == null}" class="clipsControl">
+                    <div class="clipsOrderControl">
+                        <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR">인기순</button>
+                        <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT">최신순</button>
+                    </div>
+                </div>
+                <div th:unless="${clipInfoDtoList == null}" class="clipsControl">
+                    <div class="clipsOrderControl">
+                        <button type="button" class="btn btn-outline-secondary orderBtn" name="POPULAR" onclick="clipSorting(this)">인기순</button>
+                        <button type="button" class="btn btn-outline-secondary orderBtn" name="RECENT" onclick="clipSorting(this)">최신순</button>
+                    </div>
+                </div>
+                <table th:if="${clipInfoDtoList == null}" class="clipTable">
+                    검색 결과가 없습니다.
+                </table>
+                <table th:unless="${clipInfoDtoList == null}" class="clipTable">
+                    <thead>
+                        <tr id="clipTableHead">
+                            <th class="clipInfoItem" scope="col">썸네일</th>
+                            <th class="clipInfoItem" scope="col">클립 제목</th>
+                            <th class="clipInfoItem" scope="col">재생 횟수</th>
+                            <th class="clipInfoItem" scope="col">클립 선택</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="clipTableBody">
+                        <tr>
+
+                        </tr>
+                        <tr class="clipInfo" th:each="clipInfoDto: ${clipInfoDtoList}">
+                            <th scope="col" class="clipsThumbnail clipInfoItem">
+                                <img class="clipsThumbnailImg" th:src="${clipInfoDto.getClipThumbnailUrl()}">
+                            </th>
+    <!--                        <th scope="col" id="clipInfoTitle" class="clipInfoItem" th:text="${clipInfoDto.getClipTitle()}"></th>-->
+                            <th scope="col" id="clipInfoTitle" class="clipInfoItem">
+                                <a class="clipOriginalUrl" th:href="${clipUrlSrc} + ${clipInfoDto.getOriginalUrl()}" th:text="${clipInfoDto.getClipTitle()}" target='_blank'></a>
+                            </th>
+                            <th scope="col" class="clipInfoItem" th:text="${clipInfoDto.getReadCount()}"></th>
+                            <th scope="col" id="checkClipInput" class="clipInfoItem">
+                                <a class="clipDownloadDirectAnchor" th:href="@{/clipDownloadDirect/{clipUid}(clipUid=${clipInfoDto.getOriginalUrl()})}">다운로드</a>
+    <!--                            <input type="hidden" th:value="${clipInfoDto.getVideoId()}">-->
+    <!--                            <input class="checkClip" type="checkbox" th:name="checkClip" th:value="${clipInfoDto.getOriginalUrl()}">-->
+    <!--                            <input type="hidden" th:value="${clipInfoDto.getClipTitle()}">-->
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${clipInfoDtoList == null}">
+                <ui class="paging">
+                    <li class="pageItem">
+                        <form class="pageForm" method="get">
+                            <button class="nextPage" type="button">다음 페이지</button>
+                        </form>
+                    </li>
+                </ui>
+            </div>
+            <div th:unless="${clipInfoDtoList == null}" id="mainFooter">
+                <div></div>
+                <div id="paging" class="d-flex justify-content-center mt-3">
+                    <ui class="paging">
+                        <li th:if="${nextClipUid} ne null" class="pageItem">
+                            <form class="pageForm" th:action="@{/multiDownload/{streamerName}/{orderType}/{pageCount}(streamerName=${streamerName}, orderType=${orderType}, pageCount=${pageCount + 1})}" method="get">
+                                <input type="hidden" name="nextClipUid" th:value="${nextClipUid}">
+                                <input type="hidden" name="nextReadCount" th:value="${nextReadCount}">
+                                <input type="hidden" name="pageCk" value="next">
+                                <button class="nextPage" type="submit" onclick="pageChange(this)">다음 페이지</button>
+                            </form>
+                        </li>
+                    </ui>
+                </div>
+                <div>
+    <!--                <button id="multiDownloadBtn" class="btn btn-primary" type="button">멀티 다운로드</button>-->
+                </div>
+            </div>
+            <!-- 로딩 화면 -->
+            <div class="mask">
+                <img class="loadingImg" src=''>
+                <p class="loadingText">다운로드중입니다....기다료봥~</p>
+            </div>
+            <!-- 로딩화면 끝 -->
+        </div>
+        <div id="mainRight">
         </div>
     </div>
 

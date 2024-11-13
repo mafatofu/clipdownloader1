@@ -245,6 +245,7 @@ public class MainController {
             Model model
     ){
         String email = authFacade.getAuth().getName();
+        model.addAttribute("userId", authFacade.getAuth().getName());
         //페이징을 통해 한번에 10개씩 가져오기
         return "downloader1/downloadLog";
     }

@@ -2,8 +2,43 @@
 <html lang="kr" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="~{common/header :: headerFragment}"></th:block>
+    <style>
+        .centered-container-new{
+            color: aliceblue;
+        }
+        #navi{
+            display: flex;
+            justify-content: space-around;
+        }
+        #main{
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
 </head>
 <body>
+<div id="navi">
+    <a href="/">
+        <img src="/img/home.png" width="50%" alt="chzzk Clip Downloader">
+    </a>
+    <div></div>
+    <div id="loginBar">
+        <!-- 마이프로필 및 로그아웃 버튼 (인증된 사용자만 보임) -->
+        <div sec:authorize="isAuthenticated()" class="centered-container-new">
+            <p>
+            <h6>반갑습니다, <strong><span th:text="${userId}"></span></strong>님!</h6>
+            </p>
+            <p>
+            <form action="/logout" method="post" style="display: inline;">
+                <a href="/downloadLog" class="btn btn-info btn-spacing" style="margin-right: 10px;">다운로드 기록</a>
+                <input type="submit" value="로그아웃" class="btn btn-danger">
+            </form>
+            </p>
+        </div>
+    </div>
+</div>
+<div id="main">
+    <div></div>
     <!--프로필 수정-->
     <div id="profileUpdate">
         <section>
@@ -44,18 +79,8 @@
             </div>
         </section>
     </div>
-    <!-- 마이프로필 및 로그아웃 버튼 (인증된 사용자만 보임) -->
-    <div sec:authorize="isAuthenticated()" class="centered-container-new">
-        <p>
-        <h6>반갑습니다, <strong><span th:text="${userId}"></span></strong>님!</h6>
-        </p>
-        <p>
-        <form action="/logout" method="post" style="display: inline;">
-            <a href="/downloadLog" class="btn btn-info btn-spacing" style="margin-right: 10px;">다운로드 기록</a>
-            <input type="submit" value="로그아웃" class="btn btn-danger">
-        </form>
-        </p>
-    </div>
+    <div></div>
+</div>
 <script th:inline="javascript">
     const myNickName = [[${member.nickName}]];
     const memberEmail = [[${member.email}]];
