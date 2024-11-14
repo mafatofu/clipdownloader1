@@ -122,6 +122,7 @@ public class MemberController {
         return memberService.duplicateCkForNickname(nickName);
     }
 
+
     //이메일 중복확인
     @PostMapping("/duplicateCkForEmail")
     @ResponseBody
