@@ -33,6 +33,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     //jsoup 크롤링용
     implementation 'org.jsoup:jsoup:1.18.1'
+    testImplementation 'org.projectlombok:lombok:1.18.28'
     compileOnly 'org.projectlombok:lombok'
     //selenium 크롤링
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
@@ -59,6 +60,14 @@ dependencies {
 
     //메일전송
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.3'
+
+    //redis 추가
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    //openai
+    implementation 'org.springframework.ai:spring-ai-openai:1.0.0-M3'
+
+
 }
 
 tasks.named('test') {
