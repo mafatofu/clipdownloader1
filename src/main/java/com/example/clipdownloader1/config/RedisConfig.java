@@ -17,8 +17,8 @@ public class RedisConfig {
 
     @Bean
     LettuceConnectionFactory connectionFactory(){
-
         return new LettuceConnectionFactory(host, port);
+
     }
     @Bean
     public RedisTemplate<String, Object> redisTemplate(){
