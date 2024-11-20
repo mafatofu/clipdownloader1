@@ -64,9 +64,6 @@ dependencies {
     //redis 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    //openai
-    implementation 'org.springframework.ai:spring-ai-openai:1.0.0-M3'
-
 
 }
 
