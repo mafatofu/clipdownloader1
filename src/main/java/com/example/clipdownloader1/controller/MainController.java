@@ -166,6 +166,8 @@ public class MainController {
         model.addAttribute("pageCount", pageCount);
         //정렬기준
         model.addAttribute("orderType", orderType);
+        //닉네임
+        model.addAttribute("userId", authFacade.getAuth().getName());
         return "downloader1/multiDownload";
 
     }
