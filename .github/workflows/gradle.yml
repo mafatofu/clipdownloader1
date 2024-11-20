@@ -22,7 +22,11 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
+        
+    # gradlew is not executable 문제 해결을 위해 추가
+    - name: Run chmod to make gradlew executable
+      run: chmod +x ./gradlew
+    
     # 2. Spring Boot 애플리케이션 빌드
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
@@ -43,3 +47,5 @@ jobs:
     # 5. Docker Hub 이미지 푸시
     - name: docker Hub push
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/github-actions-demo
+    
+
