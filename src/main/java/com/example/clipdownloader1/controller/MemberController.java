@@ -112,6 +112,7 @@ public class MemberController {
 
     }
 
+
     //닉네임 중복확인
     @PostMapping("/duplicateCkForNickname")
     @ResponseBody
