@@ -11,6 +11,14 @@ permissions:
   contents: read
 
 jobs:
+# secrets 내용을 읽어 yaml 파일을 특정 위치에 생성
+- name: make application.yml
+run: |
+  mkdir -p ./src/main/resources
+  cd ./src/main/resources
+  touch ./application-dev.yaml
+  echo "${{ secrets.APPLICATION_DEV }}" > ./application-dev.yaml
+  
   # Spring Boot 애플리케이션을 빌드하여 도커허브에 푸시하는 과정
   build-docker-image:
     runs-on: ubuntu-latest
