@@ -34,7 +34,8 @@ jobs:
         cd ./src/main/resources
         touch ./application_dev.yml
         echo "${{ secrets.APPLICATION_DEV }}" > ./application_dev.yaml
-
+        echo "---- application.yaml show text ----" > ./application_dev.yaml
+        
     # 2. Spring Boot 애플리케이션 빌드
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
