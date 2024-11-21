@@ -2,18 +2,44 @@ spring:
   thymeleaf:
     cache: false # 이미 생성된 결과를 서버에서 계속 보관할 것인지에 대한 설정
   datasource:
-    url: jdbc:sqlite:db.sqlite
-    driver-class-name: org.sqlite.JDBC
+    url: jdbc:mysql://clipdownloaderdb1.cj00gceac4h6.ap-northeast-2.rds.amazonaws.com:3306/clipDownloader?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: dbAdmin
+    password: adkdhwkzl33!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#  datasource:
+#    url: jdbc:sqlite:db.sqlite
+#    driver-class-name: org.sqlite.JDBC
   #    username: sa
   #    password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     database-platform: org.hibernate.community.dialect.SQLiteDialect
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-      location: src/main/resources/tempClips
+      location: C:\chzzkClip
       enabled: true
+      #reload
+  devtools:
+    livereload:
+      enabled: true # LiveReload 브라우저 확장프로그램 설치시 적용
+    restart:
+      enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: noreplyJustSend111@gmail.com
+    password: qgki ucsa piqh edir
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          timeout: 20000
+
+
