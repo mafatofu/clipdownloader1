@@ -44,6 +44,9 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
     runtimeOnly 'org.hibernate.orm:hibernate-community-dialects:6.2.4.Final'
 
+    //mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
     // Querydsl
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
