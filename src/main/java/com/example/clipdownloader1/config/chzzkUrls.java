@@ -11,6 +11,7 @@ public class chzzkUrls {
     /**치지직 스트리머 검색url
      * 해당 결과에서 스트리머의 uid를 얻어낼 수 있다.
      * */
+
     public String streamerSearchUrl(
             String streamerName
     ) throws UnsupportedEncodingException {
